@@ -1,0 +1,15 @@
+# Keep the build context small: only the plugin + Dockerfile are needed.
+.git/
+.gitignore
+.design/
+.playwright-mcp/
+.claude/
+samples/
+bin/
+migration/
+docker-compose.yml
+*.md
+**/.DS_Store
+.DS_Store
+node_modules/
+**/node_modules/

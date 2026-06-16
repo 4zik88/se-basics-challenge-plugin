@@ -1,0 +1,74 @@
+[
+  {
+    "question_text": "What is the primary goal of a technical discovery call?",
+    "answer_a": "Close the deal on the first call",
+    "answer_b": "Understand the customer's technical requirements and pain points",
+    "answer_c": "Give a full product demo",
+    "answer_d": "Negotiate pricing",
+    "correct_answer": "B",
+    "knowledge_area": "Discovery",
+    "difficulty": 2,
+    "public_note": "Discovery is about listening, not pitching. Map needs before showing the product.",
+    "internal_note": "Common SE 101 question."
+  },
+  {
+    "question_text": "During a demo, the prospect asks about a feature your product does not have. What is the best response?",
+    "answer_a": "Say the feature exists to keep momentum",
+    "answer_b": "Acknowledge the gap honestly and explore the underlying need",
+    "answer_c": "Change the subject immediately",
+    "answer_d": "End the demo",
+    "correct_answer": "B",
+    "knowledge_area": "Demos",
+    "difficulty": 4,
+    "public_note": "Honesty builds trust; uncover the real requirement behind the request.",
+    "internal_note": ""
+  },
+  {
+    "question_text": "What does 'POC' stand for in a sales engineering context?",
+    "answer_a": "Point of Contact",
+    "answer_b": "Proof of Concept",
+    "answer_c": "Plan of Customization",
+    "answer_d": "Product Onboarding Checklist",
+    "correct_answer": "B",
+    "knowledge_area": "Fundamentals",
+    "difficulty": 1,
+    "public_note": "A Proof of Concept validates the solution against real customer criteria.",
+    "internal_note": ""
+  },
+  {
+    "question_text": "Which document defines the success criteria a customer must see during an evaluation?",
+    "answer_a": "Statement of Work",
+    "answer_b": "Mutual Action Plan / Success Criteria",
+    "answer_c": "Master Service Agreement",
+    "answer_d": "Non-Disclosure Agreement",
+    "correct_answer": "B",
+    "knowledge_area": "Evaluations",
+    "difficulty": 5,
+    "public_note": "Agreeing on success criteria up front prevents endless evaluations.",
+    "internal_note": "Sometimes called 'exit criteria'."
+  },
+  {
+    "question_text": "A customer raises a security objection about data residency. Who should the SE typically involve?",
+    "answer_a": "No one, answer from memory",
+    "answer_b": "The security or compliance specialist / solutions architect",
+    "answer_c": "The marketing team",
+    "answer_d": "The billing department",
+    "correct_answer": "B",
+    "knowledge_area": "Objection Handling",
+    "difficulty": 6,
+    "public_note": "Know when to escalate to a specialist instead of guessing on compliance.",
+    "internal_note": ""
+  },
+  {
+    "question_text": "In <em>MEDDIC</em>, what does the 'C' stand for?",
+    "answer_a": "Closing",
+    "answer_b": "Champion",
+    "answer_c": "Compliance",
+    "answer_d": "Customer",
+    "correct_answer": "B",
+    "knowledge_area": "Sales Methodology",
+    "difficulty": 7,
+    "public_note": "The Champion sells internally on your behalf <em>when you are not in the room</em>.",
+    "internal_note": ""
+  }
+]

@@ -1,0 +1,29 @@
+.naase-admin .naase-shortcode-hint {
+	background: #fff;
+	border-left: 4px solid #06509e;
+	padding: 10px 14px;
+	margin: 12px 0;
+}
+.naase-admin .naase-import-export {
+	background: #fff;
+	border: 1px solid #dcdcde;
+	padding: 14px 16px;
+	margin: 12px 0;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+.naase-admin .naase-status {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 10px;
+	font-size: 11px;
+	text-transform: uppercase;
+	font-weight: 600;
+	letter-spacing: .3px;
+}
+.naase-admin .naase-status--completed { background: #d6f0e0; color: #135c33; }
+.naase-admin .naase-status--in_progress { background: #fff4d6; color: #7a5b00; }
+.naase-admin .naase-status--timed_out { background: #fde2e2; color: #8a1f1f; }
+.naase-admin .naase-status--abandoned { background: #ececf0; color: #555; }

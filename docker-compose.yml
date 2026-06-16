@@ -1,0 +1,70 @@
+services:
+  db:
+    image: mariadb:11
+    container_name: naase_db
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: wordpress
+      MARIADB_USER: wordpress
+      MARIADB_PASSWORD: wordpress
+      MARIADB_ROOT_PASSWORD: rootpass
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  wordpress:
+    image: wordpress:6-php8.3-apache
+    container_name: naase_wp
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DEBUG: 1
+      # Make the site URL follow whatever host serves it (localhost OR the ngrok domain),
+      # and treat the request as HTTPS when ngrok forwards it. This avoids hard-coding the
+      # site URL and the redirect loops you normally get when tunnelling a local WP.
+      WORDPRESS_CONFIG_EXTRA: |
+        if ( ! empty( $$_SERVER['HTTP_X_FORWARDED_PROTO'] ) && $$_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https' ) {
+            $$_SERVER['HTTPS'] = 'on';
+        }
+        if ( ! empty( $$_SERVER['HTTP_HOST'] ) ) {
+            $$scheme = ( ! empty( $$_SERVER['HTTPS'] ) && $$_SERVER['HTTPS'] !== 'off' ) ? 'https' : 'http';
+            define( 'WP_HOME', $$scheme . '://' . $$_SERVER['HTTP_HOST'] );
+            define( 'WP_SITEURL', $$scheme . '://' . $$_SERVER['HTTP_HOST'] );
+        }
+        define( 'WP_ENVIRONMENT_TYPE', 'local' );
+    volumes:
+      - wp_data:/var/www/html
+      - ./naase-challenge:/var/www/html/wp-content/plugins/naase-challenge
+
+  wpcli:
+    image: wordpress:cli-php8.3
+    container_name: naase_wpcli
+    depends_on:
+      wordpress:
+        condition: service_started
+    user: "33:33"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wp_data:/var/www/html
+      - ./naase-challenge:/var/www/html/wp-content/plugins/naase-challenge
+    entrypoint: ["tail", "-f", "/dev/null"]
+
+volumes:
+  db_data:
+  wp_data:

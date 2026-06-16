@@ -1,0 +1,6 @@
+.design/
+.DS_Store
+node_modules/
+migration/
+.claude/
+.playwright-mcp/
