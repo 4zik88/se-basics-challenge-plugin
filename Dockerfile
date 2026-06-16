@@ -9,9 +9,13 @@ FROM wordpress:6-php8.3-apache
 COPY --chown=www-data:www-data naase-challenge \
      /usr/src/wordpress/wp-content/plugins/naase-challenge
 
-# Pretty URLs (/naase-result/{token}/, /naase-leaderboard/) need mod_rewrite.
-# It ships enabled in the official image; enable explicitly to be safe.
-RUN a2enmod rewrite
+# Force a single MPM. mod_php needs prefork; if the build ends up with both
+# prefork and event/worker enabled, Apache aborts with "More than one MPM
+# loaded". Disabling the others explicitly keeps the start deterministic.
+# Also enable mod_rewrite for the plugin's pretty URLs
+# (/naase-result/{token}/, /naase-leaderboard/).
+RUN a2dismod mpm_event mpm_worker 2>/dev/null || true; \
+    a2enmod mpm_prefork rewrite
 
 # Listen on the port the platform assigns. Railway injects $PORT; the default of
 # 80 keeps `docker run -p 80:80 ...` working for a plain local build.
