@@ -27,7 +27,7 @@ $page_link = static function ( $p ) {
 				<p class="naase-lb-sub"><?php esc_html_e( 'See how participants rank by score and completion time in the NAASE Sales Engineering Basics Challenge.', 'naase-challenge' ); ?></p>
 			</div>
 			<a class="naase-btn leaderboard naase-btn--primary naase-btn--sm" href="<?php echo esc_url( $challenge ); ?>">
-				<?php esc_html_e( 'Challenge Yourself', 'naase-challenge' ); ?>
+				<?php esc_html_e( 'Challenge yourself', 'naase-challenge' ); ?>
 				<svg class="naase-btn-ico naase-btn-ico--after" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4.16602 9.99935H15.8327M9.99935 15.8327L15.8327 9.99935L9.99935 4.16602" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
 			</a>
 		</div>
