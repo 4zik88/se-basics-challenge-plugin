@@ -343,6 +343,9 @@ class NAASE_Attempts {
 		if ( '' === $first || '' === $last ) {
 			return new WP_Error( 'naase_missing_name', __( 'Please enter your first and last name.', 'naase-challenge' ), array( 'status' => 400 ) );
 		}
+		if ( preg_match( '/[0-9]/', $first . $last ) ) {
+			return new WP_Error( 'naase_bad_name', __( 'First and last name can contain letters only.', 'naase-challenge' ), array( 'status' => 400 ) );
+		}
 		if ( ! is_email( $email ) ) {
 			return new WP_Error( 'naase_bad_email', __( 'Please enter a valid email address.', 'naase-challenge' ), array( 'status' => 400 ) );
 		}

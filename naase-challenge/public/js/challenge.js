@@ -315,6 +315,14 @@
 		var membership = form.querySelector('[name="membership_interest"]');
 		var linkedin = form.querySelector('.naase-linkedin');
 
+		// Name fields accept letters only — strip digits/symbols as the user types.
+		form.querySelectorAll('[name="first_name"], [name="last_name"]').forEach(function (inp) {
+			inp.addEventListener('input', function () {
+				var cleaned = inp.value.replace(/[^\p{L} .'-]/gu, '');
+				if (cleaned !== inp.value) { inp.value = cleaned; }
+			});
+		});
+
 		membership.addEventListener('change', function () {
 			linkedin.hidden = !membership.checked;
 			linkedin.required = membership.checked;
@@ -353,17 +361,44 @@
 	function submitForm(form, result) {
 		var errBox = form.querySelector('.naase-form-error');
 		errBox.hidden = true;
+
+		var first = form.first_name.value.trim();
+		var last = form.last_name.value.trim();
+		var email = form.email.value.trim();
+		var wantsMembership = form.membership_interest.checked;
+		var linkedinUrl = form.linkedin.value.trim();
+
+		// Validate everything up front so all problems show at once (no per-field round trips).
+		var nameOk = /^[\p{L}][\p{L} .'-]*$/u;
+		var errors = [];
+		if (!first || !last) {
+			errors.push('Please enter your first and last name.');
+		} else if (!nameOk.test(first) || !nameOk.test(last)) {
+			errors.push('First and last name can contain letters only.');
+		}
+		if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+			errors.push('Please enter a valid email address.');
+		}
+		if (wantsMembership && !linkedinUrl) {
+			errors.push('A LinkedIn URL is required for NAASE associate membership interest.');
+		}
+		if (errors.length) {
+			errBox.innerHTML = errors.map(esc).join('<br>');
+			errBox.hidden = false;
+			return;
+		}
+
 		var btn = form.querySelector('button[type="submit"]');
 		btn.disabled = true;
 
 		var payload = {
 			token: state.token,
-			first_name: form.first_name.value,
-			last_name: form.last_name.value,
-			email: form.email.value,
+			first_name: first,
+			last_name: last,
+			email: email,
 			join_leaderboard: form.join_leaderboard.checked ? 1 : 0,
-			membership_interest: form.membership_interest.checked ? 1 : 0,
-			linkedin: form.linkedin.value,
+			membership_interest: wantsMembership ? 1 : 0,
+			linkedin: linkedinUrl,
 			company_website: form.company_website.value
 		};
 
