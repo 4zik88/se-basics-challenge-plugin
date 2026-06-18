@@ -189,6 +189,19 @@ class NAASE_Questions {
 	}
 
 	/**
+	 * Delete every question and reset the id counter, so the next inserts start at 1.
+	 * Used by "replace bank" import to give clean Q1, Q2, … numbering.
+	 *
+	 * @return void
+	 */
+	public static function delete_all_and_reset() {
+		global $wpdb;
+		$table = NAASE_DB::questions();
+		$wpdb->query( "DELETE FROM {$table}" ); // phpcs:ignore WordPress.DB
+		$wpdb->query( "ALTER TABLE {$table} AUTO_INCREMENT = 1" ); // phpcs:ignore WordPress.DB
+	}
+
+	/**
 	 * Whether a question with the given (already sanitised) text already exists.
 	 * Used to skip duplicates on import.
 	 *

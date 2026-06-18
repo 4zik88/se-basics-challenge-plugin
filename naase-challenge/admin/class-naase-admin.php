@@ -78,7 +78,10 @@ class NAASE_Admin {
 				if ( 'imported' === $key ) {
 					$imported = isset( $_GET['imported'] ) ? (int) $_GET['imported'] : 0; // phpcs:ignore WordPress.Security.NonceVerification
 					$skipped  = isset( $_GET['skipped'] ) ? (int) $_GET['skipped'] : 0; // phpcs:ignore WordPress.Security.NonceVerification
-					$text     = sprintf( 'Imported %d question(s).', $imported );
+					$replaced = ! empty( $_GET['replaced'] ); // phpcs:ignore WordPress.Security.NonceVerification
+					$text     = $replaced
+						? sprintf( 'Imported %d question(s), renumbered from 1.', $imported )
+						: sprintf( 'Imported %d question(s).', $imported );
 					if ( $skipped > 0 ) {
 						$text .= sprintf( ' Skipped %d duplicate(s).', $skipped );
 					}
@@ -225,10 +228,11 @@ class NAASE_Admin {
 			</p>
 
 			<div class="naase-import-export">
-				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" enctype="multipart/form-data" style="display:inline-block;margin-right:20px;">
+				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" enctype="multipart/form-data" style="display:inline-block;margin-right:20px;" onsubmit="if(this.naase_replace.checked){return confirm('This will DELETE all existing questions and renumber the imported ones from 1. Continue?');}return true;">
 					<input type="hidden" name="action" value="naase_import_questions">
 					<?php wp_nonce_field( 'naase_import_questions' ); ?>
 					<input type="file" name="naase_file" accept=".csv,.json" required>
+					<label style="display:block;margin:6px 0;"><input type="checkbox" name="naase_replace" value="1" checked> Replace bank &amp; renumber from 1 (Q1, Q2, …)</label>
 					<?php submit_button( 'Import CSV / JSON', 'secondary', 'submit', false ); ?>
 				</form>
 				<a class="button" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=naase_export_questions&format=csv' ), 'naase_export_questions' ) ); ?>">Export CSV</a>
@@ -492,6 +496,12 @@ class NAASE_Admin {
 			$rows = self::parse_csv( $raw );
 		}
 
+		// Replace mode wipes the bank and renumbers from 1 (clean Q1, Q2, … ids).
+		$replace = ! empty( $_POST['naase_replace'] );
+		if ( $replace ) {
+			NAASE_Questions::delete_all_and_reset();
+		}
+
 		$count   = 0;
 		$skipped = 0;
 		$seen    = array();
@@ -501,8 +511,8 @@ class NAASE_Admin {
 			}
 			$fields = NAASE_Questions::sanitize( $row );
 			$key    = $fields['question_text'];
-			// Skip blanks, duplicates within the file, and questions already in the bank.
-			if ( '' === $key || isset( $seen[ $key ] ) || NAASE_Questions::exists_by_text( $key ) ) {
+			// Skip blanks, duplicates within the file, and (append mode) questions already in the bank.
+			if ( '' === $key || isset( $seen[ $key ] ) || ( ! $replace && NAASE_Questions::exists_by_text( $key ) ) ) {
 				$skipped++;
 				continue;
 			}
@@ -510,7 +520,7 @@ class NAASE_Admin {
 			NAASE_Questions::insert( $fields );
 			$count++;
 		}
-		self::redirect( 'naase-questions', 'imported', array( 'imported' => $count, 'skipped' => $skipped ) );
+		self::redirect( 'naase-questions', 'imported', array( 'imported' => $count, 'skipped' => $skipped, 'replaced' => $replace ? 1 : 0 ) );
 	}
 
 	private static function parse_csv( $raw ) {

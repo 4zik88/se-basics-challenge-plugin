@@ -551,7 +551,9 @@ class NAASE_Attempts {
 	}
 
 	/**
-	 * Build a human answer string like "1-C, 2-B, 3-A" in attempt order.
+	 * Build an answer string keyed by question-bank id, sorted ascending, like
+	 * "Q12-C, Q42-B, Q57-A". Bank ids (not the randomised attempt position) make the
+	 * data comparable across attempts for statistics and analysis.
 	 *
 	 * @param int[] $question_ids Attempt question ids (ordered).
 	 * @param array $answers      qid => letter.
@@ -559,11 +561,13 @@ class NAASE_Attempts {
 	 */
 	private static function build_answers_string( array $question_ids, array $answers ) {
 		$parts = array();
-		foreach ( $question_ids as $i => $qid ) {
+		foreach ( $question_ids as $qid ) {
+			$qid = (int) $qid;
 			if ( isset( $answers[ $qid ] ) ) {
-				$parts[] = ( $i + 1 ) . '-' . strtoupper( $answers[ $qid ] );
+				$parts[ $qid ] = 'Q' . $qid . '-' . strtoupper( $answers[ $qid ] );
 			}
 		}
+		ksort( $parts );
 		return implode( ', ', $parts );
 	}
 

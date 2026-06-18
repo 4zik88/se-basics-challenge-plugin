@@ -48,7 +48,7 @@ The body is a JSON object with these fields:
   "tier": "SE Basics Ready",
   "duration_seconds": 312,
   "duration_text": "5 minutes 12 seconds",
-  "answers": "1-C,2-B,3-A,...",
+  "answers": "Q12-C, Q42-B, Q57-A, ...",
   "join_leaderboard": true,
   "membership_interest": false,
   "linkedin": "https://linkedin.com/in/johndoe",
@@ -73,7 +73,7 @@ The body is a JSON object with these fields:
 | `tier` | string | One of: `SE Basics Explorer` (0–5), `SE Basics Builder` (6–8), `SE Basics Ready` (9–10), `SE Basics Ace` (11–12) |
 | `duration_seconds` | integer | Server-measured time to complete |
 | `duration_text` | string | Human-readable duration |
-| `answers` | string | Answer log, e.g. `1-C,2-B,3-A` |
+| `answers` | string | Answer log keyed by question-bank ID (sorted), e.g. `Q12-C, Q42-B, Q57-A`. `Q12-C` = bank question 12 was answered C. IDs are stable across attempts (unlike the randomized display order), so this is what you use for per-question statistics. |
 | `join_leaderboard` | boolean | User opted into the public leaderboard |
 | `membership_interest` | boolean | User is interested in NAASE membership |
 | `linkedin` | string | LinkedIn URL, or empty string `""` |
