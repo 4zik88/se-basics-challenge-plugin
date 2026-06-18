@@ -368,25 +368,38 @@
 		var wantsMembership = form.membership_interest.checked;
 		var linkedinUrl = form.linkedin.value.trim();
 
-		// Validate everything up front so all problems show at once (no per-field round trips).
-		var nameOk = /^[\p{L}][\p{L} .'-]*$/u;
-		var errors = [];
-		if (!first || !last) {
-			errors.push('Please enter your first and last name.');
-		} else if (!nameOk.test(first) || !nameOk.test(last)) {
-			errors.push('First and last name can contain letters only.');
-		}
-		if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-			errors.push('Please enter a valid email address.');
-		}
-		if (wantsMembership && !linkedinUrl) {
-			errors.push('A LinkedIn URL is required for NAASE associate membership interest.');
-		}
-		if (errors.length) {
-			errBox.innerHTML = errors.map(esc).join('<br>');
+		// Validate up front. Empty required fields → one combined message + highlight;
+		// otherwise check formats. Highlights clear as soon as the field is edited.
+		var required = [
+			{ field: form.first_name, empty: !first },
+			{ field: form.last_name, empty: !last },
+			{ field: form.email, empty: !email }
+		];
+		if (wantsMembership) { required.push({ field: form.linkedin, empty: !linkedinUrl }); }
+
+		form.querySelectorAll('.naase-field--error').forEach(function (f) { f.classList.remove('naase-field--error'); });
+
+		function flag(field, message) {
+			field.classList.add('naase-field--error');
+			field.addEventListener('input', function clear() {
+				field.classList.remove('naase-field--error');
+				field.removeEventListener('input', clear);
+			});
+			errBox.textContent = message;
 			errBox.hidden = false;
+		}
+
+		var missing = required.filter(function (r) { return r.empty; });
+		if (missing.length) {
+			missing.forEach(function (r) { flag(r.field, 'Please complete all required fields'); });
+			missing[0].field.focus();
 			return;
 		}
+
+		var nameOk = /^[\p{L}][\p{L} .'-]*$/u;
+		if (!nameOk.test(first)) { flag(form.first_name, 'First and last name can contain letters only.'); form.first_name.focus(); return; }
+		if (!nameOk.test(last)) { flag(form.last_name, 'First and last name can contain letters only.'); form.last_name.focus(); return; }
+		if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { flag(form.email, 'Please enter a valid email address.'); form.email.focus(); return; }
 
 		var btn = form.querySelector('button[type="submit"]');
 		btn.disabled = true;

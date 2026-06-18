@@ -536,6 +536,11 @@
     background: #F4F8FD;
 }
 
+.naase-field--error {
+    box-shadow: inset 0 0 0 1.5px #c0392b;
+    background: #fdf3f2;
+}
+
 .naase-check {
     display: flex;
     align-items: flex-start;
