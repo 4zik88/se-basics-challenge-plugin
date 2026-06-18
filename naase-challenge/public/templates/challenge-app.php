@@ -65,8 +65,8 @@ $feature_icons = array( 'help', 'tiers', 'badge', 'star' );
 		<div class="naase-screen-inner naase-text-center">
 			<h1 class="naase-title"><?php echo esc_html( $settings['challenge_title'] ); ?></h1>
 			<p class="naase-lead">
-				<strong><?php echo esc_html( $settings['timeout_title'] ); ?></strong><br>
-				<strong><?php echo nl2br( esc_html( $settings['timeout_text'] ) ); ?></strong>
+				<?php echo esc_html( $settings['timeout_title'] ); ?><br>
+				<?php echo nl2br( esc_html( $settings['timeout_text'] ) ); ?>
 			</p>
 			<div class="naase-actions">
 				<button type="button" class="naase-btn naase-btn--primary" data-action="start">
