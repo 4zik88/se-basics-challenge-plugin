@@ -12,9 +12,10 @@ class NAASE_OpenGraph {
 	/**
 	 * Print meta tags for a given attempt result row. Called from the result template head.
 	 *
-	 * @param array $row Attempt row.
+	 * @param array       $row           Attempt row.
+	 * @param string|null $canonical_url Override for og:url (e.g. the share endpoint). Defaults to the result URL.
 	 */
-	public static function render( array $row ) {
+	public static function render( array $row, $canonical_url = null ) {
 		$summary = NAASE_Attempts::result_summary( $row );
 		$name    = trim( $row['first_name'] . ' ' . $row['last_name'] );
 		$name    = '' !== $name ? $name : 'A challenger';
@@ -25,7 +26,7 @@ class NAASE_OpenGraph {
 		$title       = sprintf( '%s — %s', $summary['tier'], NAASE_Settings::get( 'challenge_title' ) );
 		$description = $share;
 		$image       = NAASE_Badge::url( $summary['tier_key'] );
-		$url         = $summary['result_url'];
+		$url         = $canonical_url ? $canonical_url : $summary['result_url'];
 
 		$tags = array(
 			array( 'property' => 'og:type', 'content' => 'website' ),

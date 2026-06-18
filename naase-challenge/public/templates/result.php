@@ -28,9 +28,13 @@ $leaderboard = NAASE_Rewrites::leaderboard_url();
 
 $share_caption = NAASE_OpenGraph::interpolate( NAASE_Settings::get( 'share_text' ), $s );
 
-$linkedin = 'https://www.linkedin.com/sharing/share-offsite/?url=' . rawurlencode( $result_url );
-$facebook = 'https://www.facebook.com/sharer/sharer.php?u=' . rawurlencode( $result_url );
-$twitter  = 'https://twitter.com/intent/tweet?text=' . rawurlencode( $share_caption ) . '&url=' . rawurlencode( $result_url );
+// Shared link points at the share endpoint: crawlers get the personalised badge + caption
+// card, while humans who click are redirected to the challenge start (see NAASE_Rewrites).
+$share_url = add_query_arg( 'share', '1', $result_url );
+
+$linkedin = 'https://www.linkedin.com/sharing/share-offsite/?url=' . rawurlencode( $share_url );
+$facebook = 'https://www.facebook.com/sharer/sharer.php?u=' . rawurlencode( $share_url );
+$twitter  = 'https://twitter.com/intent/tweet?text=' . rawurlencode( $share_caption ) . '&url=' . rawurlencode( $share_url );
 ?>
 <div class="naase-app naase-result">
 	<section class="naase-card naase-screen is-active">

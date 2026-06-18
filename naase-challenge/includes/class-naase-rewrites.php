@@ -78,6 +78,19 @@ class NAASE_Rewrites {
 			}
 		}
 
+		// Share endpoint (?share=1): social crawlers get the personalised OG card,
+		// human visitors are sent to the challenge start so they can take it themselves.
+		if ( $valid && isset( $_GET['share'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+			if ( ! self::is_social_crawler() ) {
+				wp_safe_redirect( self::challenge_url(), 302 );
+				exit;
+			}
+			NAASE_Badge::ensure( $row );
+			$share_url = add_query_arg( 'share', '1', NAASE_Attempts::result_url( $row['token'] ) );
+			self::render_share_meta( $row, $share_url );
+			exit;
+		}
+
 		status_header( $valid ? 200 : 404 );
 
 		if ( $valid ) {
@@ -138,6 +151,60 @@ class NAASE_Rewrites {
 </body>
 </html>
 		<?php
+	}
+
+	/**
+	 * Minimal OG-only document served to social crawlers hitting the share endpoint.
+	 *
+	 * The card image/text are personalised (the attempt badge + caption) and og:url is
+	 * self-referential, so when a human later clicks the card they land back on this
+	 * endpoint and get 302'd to the challenge start (see render_result).
+	 *
+	 * @param array  $row       Attempt row.
+	 * @param string $share_url Canonical share URL (this endpoint).
+	 */
+	private static function render_share_meta( array $row, $share_url ) {
+		header( 'Content-Type: text/html; charset=utf-8' );
+		$start = self::challenge_url();
+		?>
+<!doctype html>
+<html <?php language_attributes(); ?>>
+<head>
+	<meta charset="<?php bloginfo( 'charset' ); ?>">
+		<?php NAASE_OpenGraph::render( $row, $share_url ); ?>
+	<title><?php echo esc_html( NAASE_Settings::get( 'challenge_title' ) ); ?></title>
+	<meta http-equiv="refresh" content="0; url=<?php echo esc_url( $start ); ?>">
+</head>
+<body>
+	<a href="<?php echo esc_url( $start ); ?>"><?php echo esc_html( NAASE_Settings::get( 'challenge_title' ) ); ?></a>
+</body>
+</html>
+		<?php
+	}
+
+	/**
+	 * Whether the current request is a known social-media / link-preview crawler.
+	 * Used so share links can serve OG tags to bots but redirect humans to the start.
+	 *
+	 * @return bool
+	 */
+	private static function is_social_crawler() {
+		$ua = isset( $_SERVER['HTTP_USER_AGENT'] ) ? strtolower( (string) $_SERVER['HTTP_USER_AGENT'] ) : '';
+		if ( '' === $ua ) {
+			return false;
+		}
+		$bots = array(
+			'facebookexternalhit', 'facebot', 'twitterbot', 'linkedinbot', 'slackbot',
+			'slack-imgproxy', 'whatsapp', 'telegrambot', 'discordbot', 'pinterest',
+			'redditbot', 'embedly', 'skypeuripreview', 'applebot', 'vkshare',
+			'googlebot', 'bingbot', 'bingpreview', 'developers.google.com/+/web/snippet',
+		);
+		foreach ( $bots as $bot ) {
+			if ( false !== strpos( $ua, $bot ) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
