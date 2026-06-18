@@ -420,6 +420,7 @@ class NAASE_Admin {
 					<tr><th><label>Email</label></th><td><input class="regular-text" type="email" name="email" value="<?php echo esc_attr( $r['email'] ); ?>"></td></tr>
 					<tr><th><label>LinkedIn</label></th><td><input class="regular-text" name="linkedin" value="<?php echo esc_attr( $r['linkedin'] ); ?>"></td></tr>
 					<tr><th><label>Score</label></th><td><input type="number" min="0" max="<?php echo (int) NAASE_QUESTIONS_PER_ATTEMPT; ?>" name="score" value="<?php echo esc_attr( $r['score'] ); ?>"></td></tr>
+					<tr><th><label for="finished_at">Completion date</label></th><td><input type="datetime-local" step="1" id="finished_at" name="finished_at" value="<?php echo esc_attr( str_replace( ' ', 'T', (string) $r['finished_at'] ) ); ?>"><p class="description">Shown as the "Date" on the leaderboard. Pick a date &amp; time.</p></td></tr>
 					<tr><th><label>Join leaderboard</label></th><td><label><input type="checkbox" name="join_leaderboard" value="1" <?php checked( (int) $r['join_leaderboard'], 1 ); ?>> Visible on public leaderboard</label></td></tr>
 				</table>
 				<p class="description">Tier is recalculated from the score on save.</p>
@@ -601,6 +602,15 @@ class NAASE_Admin {
 		if ( null !== $score ) {
 			$data['score'] = $score;
 			$data['tier']  = NAASE_Scoring::tier( $score );
+		}
+
+		// Editable completion date (the leaderboard "Date"). Normalised to MySQL datetime.
+		$finished = sanitize_text_field( $in['finished_at'] ?? '' );
+		if ( '' !== $finished ) {
+			$ts = strtotime( $finished );
+			if ( false !== $ts ) {
+				$data['finished_at'] = gmdate( 'Y-m-d H:i:s', $ts );
+			}
 		}
 
 		global $wpdb;

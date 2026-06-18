@@ -70,23 +70,29 @@ class NAASE_Leaderboard {
 		$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB
 			"SELECT id, token, first_name, last_name, email, score, tier, duration_seconds, finished_at
 			 FROM {$table}
-			 WHERE status = 'completed' AND join_leaderboard = 1 AND email <> ''",
+			 WHERE status = 'completed' AND join_leaderboard = 1",
 			ARRAY_A
 		);
 		if ( ! $rows ) {
 			return array();
 		}
 
-		// Keep the best row per (lower-cased) email.
-		$best = array();
+		// Keep the best row per (lower-cased) email. Rows without an email have no dedup
+		// key, so each is kept on its own (e.g. manually added admin entries).
+		$best       = array();
+		$standalone = array();
 		foreach ( $rows as $row ) {
-			$key = strtolower( $row['email'] );
+			$key = strtolower( trim( (string) $row['email'] ) );
+			if ( '' === $key ) {
+				$standalone[] = $row;
+				continue;
+			}
 			if ( ! isset( $best[ $key ] ) || self::compare( $row, $best[ $key ] ) < 0 ) {
 				$best[ $key ] = $row;
 			}
 		}
 
-		$ranked = array_values( $best );
+		$ranked = array_merge( array_values( $best ), $standalone );
 		usort( $ranked, array( __CLASS__, 'compare' ) );
 
 		$rank = 0;
