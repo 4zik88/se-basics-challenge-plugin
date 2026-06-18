@@ -233,7 +233,7 @@
 			'</div>' +
 			sideArea +
 			sideContext +
-			'<button type="button" class="naase-btn naase-btn--primary naase-q-next" data-action="next" disabled>Next Question</button>' +
+			'<button type="button" class="naase-btn naase-btn--primary naase-q-next" data-action="next" disabled>' + (q.number >= q.total ? 'Finish Challenge' : 'Next Question') + '</button>' +
 			'</aside>' +
 			'</div>';
 
