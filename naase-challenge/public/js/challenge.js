@@ -400,6 +400,10 @@
 		if (!nameOk.test(first)) { flag(form.first_name, 'First and last name can contain letters only.'); form.first_name.focus(); return; }
 		if (!nameOk.test(last)) { flag(form.last_name, 'First and last name can contain letters only.'); form.last_name.focus(); return; }
 		if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { flag(form.email, 'Please enter a valid email address.'); form.email.focus(); return; }
+		if (linkedinUrl && !/^(https?:\/\/)?([\w-]+\.)?linkedin\.com\/.+/i.test(linkedinUrl)) { flag(form.linkedin, 'Please enter a valid LinkedIn URL (e.g. linkedin.com/in/your-name).'); form.linkedin.focus(); return; }
+
+		// Store a clickable link even if the user omitted the scheme.
+		var linkedinNorm = linkedinUrl && !/^https?:\/\//i.test(linkedinUrl) ? 'https://' + linkedinUrl : linkedinUrl;
 
 		var btn = form.querySelector('button[type="submit"]');
 		btn.disabled = true;
@@ -411,7 +415,7 @@
 			email: email,
 			join_leaderboard: form.join_leaderboard.checked ? 1 : 0,
 			membership_interest: wantsMembership ? 1 : 0,
-			linkedin: linkedinUrl,
+			linkedin: linkedinNorm,
 			company_website: form.company_website.value
 		};
 

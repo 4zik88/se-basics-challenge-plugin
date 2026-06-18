@@ -352,6 +352,9 @@ class NAASE_Attempts {
 		if ( $membership && '' === $linkedin ) {
 			return new WP_Error( 'naase_missing_linkedin', __( 'A LinkedIn URL is required for NAASE associate membership interest.', 'naase-challenge' ), array( 'status' => 400 ) );
 		}
+		if ( '' !== $linkedin && ! preg_match( '#^https?://([\w-]+\.)?linkedin\.com/#i', $linkedin ) ) {
+			return new WP_Error( 'naase_bad_linkedin', __( 'Please enter a valid LinkedIn URL.', 'naase-challenge' ), array( 'status' => 400 ) );
+		}
 
 		global $wpdb;
 		$wpdb->update( // phpcs:ignore WordPress.DB
