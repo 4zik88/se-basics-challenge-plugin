@@ -74,7 +74,16 @@ class NAASE_Admin {
 			$key = sanitize_key( wp_unslash( $_GET['naase_msg'] ) ); // phpcs:ignore WordPress.Security.NonceVerification
 			if ( isset( $map[ $key ] ) ) {
 				$class = 'error' === $key ? 'notice-error' : 'notice-success';
-				printf( '<div class="notice %s is-dismissible"><p>%s</p></div>', esc_attr( $class ), esc_html( $map[ $key ] ) );
+				$text  = $map[ $key ];
+				if ( 'imported' === $key ) {
+					$imported = isset( $_GET['imported'] ) ? (int) $_GET['imported'] : 0; // phpcs:ignore WordPress.Security.NonceVerification
+					$skipped  = isset( $_GET['skipped'] ) ? (int) $_GET['skipped'] : 0; // phpcs:ignore WordPress.Security.NonceVerification
+					$text     = sprintf( 'Imported %d question(s).', $imported );
+					if ( $skipped > 0 ) {
+						$text .= sprintf( ' Skipped %d duplicate(s).', $skipped );
+					}
+				}
+				printf( '<div class="notice %s is-dismissible"><p>%s</p></div>', esc_attr( $class ), esc_html( $text ) );
 			}
 		}
 	}
@@ -483,15 +492,25 @@ class NAASE_Admin {
 			$rows = self::parse_csv( $raw );
 		}
 
-		$count = 0;
+		$count   = 0;
+		$skipped = 0;
+		$seen    = array();
 		foreach ( $rows as $row ) {
 			if ( empty( $row['question_text'] ) ) {
 				continue;
 			}
-			NAASE_Questions::insert( NAASE_Questions::sanitize( $row ) );
+			$fields = NAASE_Questions::sanitize( $row );
+			$key    = $fields['question_text'];
+			// Skip blanks, duplicates within the file, and questions already in the bank.
+			if ( '' === $key || isset( $seen[ $key ] ) || NAASE_Questions::exists_by_text( $key ) ) {
+				$skipped++;
+				continue;
+			}
+			$seen[ $key ] = true;
+			NAASE_Questions::insert( $fields );
 			$count++;
 		}
-		self::redirect( 'naase-questions', 'imported', array( 'imported' => $count ) );
+		self::redirect( 'naase-questions', 'imported', array( 'imported' => $count, 'skipped' => $skipped ) );
 	}
 
 	private static function parse_csv( $raw ) {

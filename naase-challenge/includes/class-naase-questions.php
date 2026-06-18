@@ -189,6 +189,20 @@ class NAASE_Questions {
 	}
 
 	/**
+	 * Whether a question with the given (already sanitised) text already exists.
+	 * Used to skip duplicates on import.
+	 *
+	 * @param string $question_text Sanitised question text.
+	 * @return bool
+	 */
+	public static function exists_by_text( $question_text ) {
+		global $wpdb;
+		$table = NAASE_DB::questions();
+		$id    = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE question_text = %s LIMIT 1", $question_text ) ); // phpcs:ignore WordPress.DB
+		return null !== $id;
+	}
+
+	/**
 	 * Insert a new question. Returns the new id or 0 on failure.
 	 *
 	 * @param array $fields Sanitised fields.
