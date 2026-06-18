@@ -551,11 +551,12 @@ class NAASE_Attempts {
 	}
 
 	/**
-	 * Build an answer string keyed by question-bank id, sorted ascending, like
-	 * "Q12-C, Q42-B, Q57-A". Bank ids (not the randomised attempt position) make the
-	 * data comparable across attempts for statistics and analysis.
+	 * Build an answer string in the order the questions were presented, each labelled by
+	 * its question-bank id, like "Q42-B, Q12-C, Q57-A". This records what came up, in what
+	 * order, and how the person answered — and the bank ids keep it comparable across the
+	 * randomised attempts for per-question statistics.
 	 *
-	 * @param int[] $question_ids Attempt question ids (ordered).
+	 * @param int[] $question_ids Attempt question ids, in presentation order.
 	 * @param array $answers      qid => letter.
 	 * @return string
 	 */
@@ -564,10 +565,9 @@ class NAASE_Attempts {
 		foreach ( $question_ids as $qid ) {
 			$qid = (int) $qid;
 			if ( isset( $answers[ $qid ] ) ) {
-				$parts[ $qid ] = 'Q' . $qid . '-' . strtoupper( $answers[ $qid ] );
+				$parts[] = 'Q' . $qid . '-' . strtoupper( $answers[ $qid ] );
 			}
 		}
-		ksort( $parts );
 		return implode( ', ', $parts );
 	}
 
