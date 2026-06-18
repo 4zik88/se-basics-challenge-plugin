@@ -12,16 +12,6 @@ defined( 'ABSPATH' ) || exit;
 $s          = $args['summary'];
 $name       = trim( $s['first_name'] . ' ' . $s['last_name'] );
 $name       = '' !== $name ? $name : __( 'there', 'naase-challenge' );
-$percent    = (int) round( $s['score'] / max( 1, $s['total'] ) * 100 );
-$ordinal_words = array(
-	1 => __( 'First', 'naase-challenge' ),
-	2 => __( 'Second', 'naase-challenge' ),
-	3 => __( 'Third', 'naase-challenge' ),
-	4 => __( 'Fourth', 'naase-challenge' ),
-);
-$tier_index = NAASE_Scoring::tier_index( $s['tier_key'] );
-$ordinal    = isset( $ordinal_words[ $tier_index ] ) ? $ordinal_words[ $tier_index ] : '';
-$time_percent = (int) round( (int) $s['duration'] / max( 1, NAASE_ALLOWED_SECONDS ) * 100 );
 $badge_url  = NAASE_Badge::url( $s['tier_key'] );
 $result_url = $s['result_url'];
 $leaderboard = NAASE_Rewrites::leaderboard_url();
@@ -63,29 +53,7 @@ $twitter  = 'https://twitter.com/intent/tweet?text=' . rawurlencode( $share_capt
 						<img src="<?php echo esc_url( $badge_url ); ?>" alt="<?php echo esc_attr( $s['tier'] ); ?>" loading="lazy" />
 					</div>
 					<div class="naase-share-text">
-						<p>
-							<?php
-							printf(
-								/* translators: 1: challenge name, 2: score, 3: total */
-								esc_html__( 'I completed the %1$s with a score of %2$d/%3$d. Can you beat my score?', 'naase-challenge' ),
-								'<strong>' . esc_html( NAASE_Settings::get( 'challenge_title' ) ) . '</strong>', // phpcs:ignore
-								(int) $s['score'],
-								(int) $s['total']
-							);
-							?>
-						</p>
-						<p>⏱ <?php printf( esc_html__( 'My time is %1$s, which is %2$s of allowed time.', 'naase-challenge' ), '<strong>' . esc_html( $s['duration_text'] ) . '</strong>', '<strong>' . esc_html( $time_percent ) . '%</strong>' ); // phpcs:ignore ?></p>
-						<p>🏆 <strong><?php printf( esc_html__( '%d%% of correct answers.', 'naase-challenge' ), $percent ); // phpcs:ignore ?></strong></p>
-						<p>📊
-							<?php
-							printf(
-								/* translators: 1: ordinal (e.g. Third), 2: tier name */
-								esc_html__( '%1$s tier out of four — %2$s.', 'naase-challenge' ),
-								esc_html( $ordinal ),
-								'<strong>' . esc_html( $s['tier'] ) . '</strong>' // phpcs:ignore
-							);
-							?>
-						</p>
+						<p><?php echo nl2br( esc_html( $share_caption ) ); ?></p>
 						<a class="naase-share-link" href="<?php echo esc_url( $result_url ); ?>"><?php echo esc_html( $result_url ); ?></a>
 					</div>
 				</div>
