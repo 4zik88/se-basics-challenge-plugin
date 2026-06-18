@@ -55,20 +55,35 @@ class NAASE_OpenGraph {
 	}
 
 	/**
-	 * Replace {score}, {total}, {tier}, {time}, {name} tokens in share text.
+	 * Replace {score}, {total}, {tier}, {time}, {percent}, {time_percent}, {ordinal}
+	 * tokens in share text.
 	 *
 	 * @param string $text    Template.
 	 * @param array  $summary Result summary.
 	 * @return string
 	 */
 	public static function interpolate( $text, array $summary ) {
+		$percent      = (int) round( $summary['score'] / max( 1, $summary['total'] ) * 100 );
+		$time_percent = (int) round( (int) $summary['duration'] / max( 1, NAASE_ALLOWED_SECONDS ) * 100 );
+		$ordinals     = array(
+			1 => __( 'First', 'naase-challenge' ),
+			2 => __( 'Second', 'naase-challenge' ),
+			3 => __( 'Third', 'naase-challenge' ),
+			4 => __( 'Fourth', 'naase-challenge' ),
+		);
+		$index   = NAASE_Scoring::tier_index( $summary['tier_key'] );
+		$ordinal = isset( $ordinals[ $index ] ) ? $ordinals[ $index ] : '';
+
 		return strtr(
 			(string) $text,
 			array(
-				'{score}' => (string) $summary['score'],
-				'{total}' => (string) $summary['total'],
-				'{tier}'  => $summary['tier'],
-				'{time}'  => $summary['duration_text'],
+				'{score}'        => (string) $summary['score'],
+				'{total}'        => (string) $summary['total'],
+				'{tier}'         => $summary['tier'],
+				'{time}'         => $summary['duration_text'],
+				'{percent}'      => $percent . '%',
+				'{time_percent}' => $time_percent . '%',
+				'{ordinal}'      => $ordinal,
 			)
 		);
 	}

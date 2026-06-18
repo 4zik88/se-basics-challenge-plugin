@@ -30,7 +30,7 @@ class NAASE_Settings {
 			'timeout_title'      => 'Still there?',
 			'timeout_text'       => "This session has been open for over an hour, so it’s no longer active.\n\nYou can start again when you’re ready or view the Leaderboard.",
 			'post_completion'    => 'Enter your information to receive your detailed results, a personalized breakdown, and your digital badge:',
-			'share_text'         => "I completed the NAASE Sales Engineering Basics Challenge with a score of {score}/{total} ({tier}).\nMy time: {time}.\nCan you beat my score?",
+			'share_text'         => "I just scored {score}/{total} ({tier}) on the NAASE SE Basics Challenge! Can you beat my score?\n⏱ My time is {time}, which is {time_percent} of allowed time.\n🏆 {percent} of correct answers.\n📊 {ordinal} tier out of four — {tier}.",
 			'privacy_text'       => 'We respect your privacy. Your information is used only to deliver your results and, if you opt in, to display you on the leaderboard.',
 			'zapier_webhook_url' => '',
 		);

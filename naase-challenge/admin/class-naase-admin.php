@@ -155,8 +155,8 @@ class NAASE_Admin {
 					<tr>
 						<th><label for="share_text">Share text</label></th>
 						<td>
-							<textarea class="large-text" rows="2" id="share_text" name="share_text"><?php echo esc_textarea( $s['share_text'] ); ?></textarea>
-							<p class="description">Tokens: <code>{score}</code> <code>{total}</code> <code>{tier}</code> <code>{time}</code></p>
+							<textarea class="large-text" rows="4" id="share_text" name="share_text"><?php echo esc_textarea( $s['share_text'] ); ?></textarea>
+							<p class="description">Tokens: <code>{score}</code> <code>{total}</code> <code>{tier}</code> <code>{time}</code> <code>{percent}</code> <code>{time_percent}</code> <code>{ordinal}</code></p>
 						</td>
 					</tr>
 					<tr>
