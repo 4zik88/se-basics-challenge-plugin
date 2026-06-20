@@ -242,21 +242,22 @@ class NAASE_Admin {
 			<form method="get" style="margin:12px 0;">
 				<input type="hidden" name="page" value="naase-questions">
 				<p class="search-box">
-					<input type="search" name="s" value="<?php echo esc_attr( $search ); ?>" placeholder="Search questions">
+					<input type="search" name="s" value="<?php echo esc_attr( $search ); ?>" placeholder="Search questions (or ID: Q7)">
 					<?php submit_button( 'Search', '', '', false ); ?>
 				</p>
 			</form>
 
 			<table class="wp-list-table widefat fixed striped">
 				<thead><tr>
-					<th>Question</th><th>Knowledge area</th><th>Correct</th><th>Difficulty</th><th>Actions</th>
+					<th style="width:60px;">ID</th><th>Question</th><th>Knowledge area</th><th>Correct</th><th>Difficulty</th><th>Actions</th>
 				</tr></thead>
 				<tbody>
 				<?php if ( empty( $list['items'] ) ) : ?>
-					<tr><td colspan="5">No questions yet.</td></tr>
+					<tr><td colspan="6">No questions yet.</td></tr>
 				<?php else : ?>
 					<?php foreach ( $list['items'] as $q ) : ?>
 						<tr>
+							<td><code>Q<?php echo (int) $q['id']; ?></code></td>
 							<td><strong><?php echo esc_html( wp_trim_words( $q['question_text'], 16 ) ); ?></strong></td>
 							<td><?php echo esc_html( $q['knowledge_area'] ); ?></td>
 							<td><?php echo esc_html( $q['correct_answer'] ); ?></td>

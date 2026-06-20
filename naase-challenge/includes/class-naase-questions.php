@@ -139,10 +139,18 @@ class NAASE_Questions {
 		$where  = 'WHERE 1=1';
 		$params = array();
 		if ( '' !== $search ) {
-			$where   .= ' AND (question_text LIKE %s OR knowledge_area LIKE %s)';
-			$like     = '%' . $wpdb->esc_like( $search ) . '%';
-			$params[] = $like;
-			$params[] = $like;
+			// Let "Q7", "q7" or "7" jump straight to bank question #7 by id;
+			// otherwise fall back to a text search over question / knowledge area.
+			$id_match = ltrim( $search, 'Qq' );
+			if ( ctype_digit( $id_match ) ) {
+				$where   .= ' AND id = %d';
+				$params[] = (int) $id_match;
+			} else {
+				$where   .= ' AND (question_text LIKE %s OR knowledge_area LIKE %s)';
+				$like     = '%' . $wpdb->esc_like( $search ) . '%';
+				$params[] = $like;
+				$params[] = $like;
+			}
 		}
 
 		$count_sql = "SELECT COUNT(*) FROM {$table} {$where}";
