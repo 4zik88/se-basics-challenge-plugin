@@ -21,6 +21,8 @@ class NAASE_Zapier {
 			return;
 		}
 
+		$questions = NAASE_Attempts::questions_breakdown( $row );
+
 		$payload = array(
 			'token'               => $row['token'],
 			'first_name'          => $row['first_name'],
@@ -31,7 +33,11 @@ class NAASE_Zapier {
 			'tier'                => $row['tier'],
 			'duration_seconds'    => (int) $row['duration_seconds'],
 			'duration_text'       => NAASE_Scoring::format_duration_long( (int) $row['duration_seconds'] ),
-			'answers'             => $row['answers_string'],
+			// Full per-question breakdown — numbered 1..N as the participant answered,
+			// with full question/answer/correct-answer texts (no bank ids). Use the array
+			// for line-item mapping, or `answers_text` as a ready-made email block.
+			'questions'           => $questions,
+			'answers_text'        => self::answers_summary( $questions ),
 			'join_leaderboard'    => (bool) $row['join_leaderboard'],
 			'membership_interest' => (bool) $row['membership_interest'],
 			'linkedin'            => $row['linkedin'],
@@ -60,5 +66,27 @@ class NAASE_Zapier {
 				'sslverify' => true,
 			)
 		);
+	}
+
+	/**
+	 * Render the per-question breakdown into a plain-text block that can be dropped
+	 * straight into an email. Numbered 1..N (as the participant answered), full texts,
+	 * no bank ids.
+	 *
+	 * @param array[] $questions Output of NAASE_Attempts::questions_breakdown().
+	 * @return string
+	 */
+	private static function answers_summary( array $questions ) {
+		$lines = array();
+		foreach ( $questions as $q ) {
+			$lines[] = sprintf( '%d. %s', $q['number'], wp_strip_all_tags( $q['question'] ) );
+			$your    = '' !== $q['selected_answer'] ? wp_strip_all_tags( $q['selected_answer'] ) : '—';
+			$lines[] = sprintf( '   Your answer: %s %s', $your, $q['is_correct'] ? '✓' : '✗' );
+			if ( ! $q['is_correct'] ) {
+				$lines[] = sprintf( '   Correct answer: %s', wp_strip_all_tags( $q['correct_answer'] ) );
+			}
+			$lines[] = '';
+		}
+		return rtrim( implode( "\n", $lines ) );
 	}
 }

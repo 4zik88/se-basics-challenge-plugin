@@ -571,6 +571,68 @@ class NAASE_Attempts {
 		return implode( ', ', $parts );
 	}
 
+	/**
+	 * Per-question breakdown for an attempt, in the order the questions were presented
+	 * to the participant (numbered 1..N — the very numbering they saw, and the one that
+	 * goes out in their email). Each entry carries the full question and answer texts so
+	 * downstream consumers (Zapier, email templates) need no copy of the question bank,
+	 * and no bank ids are exposed.
+	 *
+	 * @param array $row Attempt row (needs question_ids + answers).
+	 * @return array[] List of {
+	 *     number, question, selected_letter, selected_answer,
+	 *     correct_letter, correct_answer, is_correct
+	 * }.
+	 */
+	public static function questions_breakdown( array $row ) {
+		$question_ids = self::decode_ids( $row['question_ids'] ?? '' );
+		$answers      = self::decode_answers( $row['answers'] ?? '' );
+		if ( empty( $question_ids ) ) {
+			return array();
+		}
+
+		$by_id = array();
+		foreach ( NAASE_Questions::get_many_ordered( $question_ids ) as $q ) {
+			$by_id[ (int) $q['id'] ] = $q;
+		}
+
+		$out    = array();
+		$number = 0;
+		foreach ( $question_ids as $qid ) {
+			$qid = (int) $qid;
+			if ( ! isset( $by_id[ $qid ] ) ) {
+				continue;
+			}
+			$q       = $by_id[ $qid ];
+			$chosen  = isset( $answers[ $qid ] ) ? strtoupper( $answers[ $qid ] ) : '';
+			$correct = strtoupper( (string) $q['correct_answer'] );
+			$number++;
+
+			$out[] = array(
+				'number'          => $number,
+				'question'        => $q['question_text'],
+				'selected_letter' => $chosen,
+				'selected_answer' => '' !== $chosen ? self::answer_text( $q, $chosen ) : '',
+				'correct_letter'  => $correct,
+				'correct_answer'  => self::answer_text( $q, $correct ),
+				'is_correct'      => '' !== $chosen && $chosen === $correct,
+			);
+		}
+		return $out;
+	}
+
+	/**
+	 * Full answer text for a given letter from a question row.
+	 *
+	 * @param array  $q      Question row.
+	 * @param string $letter A|B|C|D.
+	 * @return string
+	 */
+	private static function answer_text( array $q, $letter ) {
+		$key = 'answer_' . strtolower( $letter );
+		return isset( $q[ $key ] ) ? (string) $q[ $key ] : '';
+	}
+
 	private static function decode_ids( $json ) {
 		$ids = json_decode( (string) $json, true );
 		return is_array( $ids ) ? array_map( 'intval', $ids ) : array();
