@@ -6,6 +6,7 @@
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Viacheslav Tykhenkyi
+ * Author URI:        https://freelancehunt.com/freelancer/Fozikk.html
  * Text Domain:       naase-challenge
  *
  * @package NAASE_Challenge
