@@ -115,104 +115,96 @@ class NAASE_Rewrites {
 
 	/**
 	 * Render a plugin rewrite endpoint (result / leaderboard) wrapped in the site's
-	 * own header & footer so these pages carry the theme's chrome.
+	 * own header & footer, then EXIT.
 	 *
-	 * Rather than hand-build a document (which can't reproduce a block theme's layout,
-	 * root padding and global styles), we hand rendering to the active theme: the main
-	 * query is re-pointed at a real "host" page and our HTML is injected via the_content,
-	 * so WordPress renders its normal page template. Identical chrome & styling on any
-	 * theme — classic or block. Only if there is no host page do we fall back to a
-	 * self-contained, theme-independent document.
+	 * We compose a complete document ourselves and stop the request here, instead of
+	 * re-pointing the main query at a real page. Hijacking the query made WordPress and
+	 * SEO plugins treat /naase-result/{token}/ as the host page and 301-redirect it to
+	 * that page's permalink — bouncing visitors to the challenge start. Emitting the
+	 * document and exiting on template_redirect can't be redirected afterwards and never
+	 * depends on a page builder.
+	 *
+	 * Block (FSE) themes: a template-canvas-style document with the theme's header/footer
+	 * template parts. Classic themes: get_header()/get_footer(). Otherwise a
+	 * self-contained fallback document.
 	 *
 	 * @param string     $title   Page title.
 	 * @param string     $content Body HTML.
 	 * @param array|null $og_row  Attempt row for OpenGraph tags (result page only).
 	 */
 	private static function render_page( $title, $content, $og_row = null ) {
-		$host_id = self::host_page_id();
-		if ( $host_id ) {
-			self::render_in_host_page( $host_id, $title, $content, $og_row );
-			return; // WordPress keeps rendering the host page's template.
+		self::prepare_themed_head( $title, $og_row );
+
+		if ( function_exists( 'wp_is_block_theme' ) && wp_is_block_theme() ) {
+			self::render_block_document( $content );
+		} elseif ( self::theme_has_header_footer() ) {
+			self::render_classic_document( $content );
+		} else {
+			self::render_standalone( $title, $content, $og_row );
 		}
-		self::render_standalone( $title, $content, $og_row );
 		exit;
 	}
 
 	/**
-	 * A real published page whose template we borrow so plugin pages inherit the
-	 * site's header, footer and global styles. Prefer the challenge page; fall back
-	 * to the leaderboard page or any published page.
+	 * Whether the active classic theme provides header.php and footer.php.
 	 *
-	 * @return int 0 if none.
+	 * @return bool
 	 */
-	private static function host_page_id() {
-		$url = trim( (string) NAASE_Settings::get( 'challenge_page_url' ) );
-		if ( '' !== $url ) {
-			$id = url_to_postid( $url );
-			if ( $id ) {
-				return $id;
-			}
-		}
-		$id = self::find_page_with_shortcode( 'naase_challenge' );
-		if ( $id ) {
-			return $id;
-		}
-		return self::find_page_with_shortcode( 'naase_leaderboard' );
+	private static function theme_has_header_footer() {
+		return '' !== locate_template( 'header.php' ) && '' !== locate_template( 'footer.php' );
 	}
 
 	/**
-	 * Take over the main query with a host page and inject our HTML as its content,
-	 * so the active theme renders it inside the normal page template (header/footer
-	 * and global styles intact). Does NOT exit — WordPress continues to template_include.
+	 * Output the content wrapped in a classic theme's header.php & footer.php.
 	 *
-	 * @param int        $host_id Host page ID.
-	 * @param string     $title   Page title.
-	 * @param string     $content Body HTML.
-	 * @param array|null $og_row  Attempt row for OpenGraph tags (result page only).
+	 * @param string $content Body HTML.
 	 */
-	private static function render_in_host_page( $host_id, $title, $content, $og_row = null ) {
-		$host = get_post( $host_id );
-		if ( ! $host ) {
-			self::render_standalone( $title, $content, $og_row );
-			exit;
+	private static function render_classic_document( $content ) {
+		get_header();
+		echo $content; // phpcs:ignore WordPress.Security.EscapeOutput -- composed from escaped templates.
+		get_footer();
+	}
+
+	/**
+	 * Output the content inside a block (FSE) theme's header & footer template parts.
+	 *
+	 * Mirrors WordPress's template canvas: a document with wp_head()/wp_footer() (theme
+	 * global styles + plugin assets) and the theme's "header"/"footer" template parts
+	 * inside .wp-site-blocks, so the page carries the site chrome and global styling.
+	 *
+	 * @param string $content Body HTML.
+	 */
+	private static function render_block_document( $content ) {
+		header( 'Content-Type: text/html; charset=utf-8' );
+		?>
+<!doctype html>
+<html <?php language_attributes(); ?>>
+<head>
+	<meta charset="<?php bloginfo( 'charset' ); ?>">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+		<?php wp_head(); ?>
+</head>
+<body <?php body_class( 'naase-result-page' ); ?>>
+		<?php
+		if ( function_exists( 'wp_body_open' ) ) {
+			wp_body_open();
 		}
-
-		// We point the query at the host page only to borrow its template; the real URL
-		// stays /naase-result/{token}/. Stop WordPress from "correcting" that URL to the
-		// host page's permalink (which would bounce the visitor to the challenge start).
-		add_filter( 'redirect_canonical', '__return_false' );
-
-		global $wp_query, $post;
-		$post = $host;
-		setup_postdata( $post );
-
-		$wp_query->post             = $host;
-		$wp_query->posts            = array( $host );
-		$wp_query->queried_object   = $host;
-		$wp_query->queried_object_id = $host_id;
-		$wp_query->post_count       = 1;
-		$wp_query->found_posts      = 1;
-		$wp_query->max_num_pages    = 1;
-		$wp_query->is_page          = true;
-		$wp_query->is_singular      = true;
-		$wp_query->is_single        = false;
-		$wp_query->is_home          = false;
-		$wp_query->is_archive       = false;
-		$wp_query->is_404           = false;
-
-		status_header( 200 );
-
-		// Replace the host page's own content (e.g. the [naase_challenge] shortcode)
-		// with our pre-rendered HTML. Highest priority so it wins over wpautop/do_blocks.
-		add_filter(
-			'the_content',
-			static function () use ( $content ) {
-				return $content;
-			},
-			PHP_INT_MAX
-		);
-
-		self::prepare_themed_head( $title, $og_row );
+		?>
+<div class="wp-site-blocks">
+		<?php
+		if ( function_exists( 'block_header_area' ) ) {
+			block_header_area();
+		}
+		echo $content; // phpcs:ignore WordPress.Security.EscapeOutput -- composed from escaped templates.
+		if ( function_exists( 'block_footer_area' ) ) {
+			block_footer_area();
+		}
+		?>
+</div>
+		<?php wp_footer(); ?>
+</body>
+</html>
+		<?php
 	}
 
 	/**
@@ -237,8 +229,8 @@ class NAASE_Rewrites {
 				}
 			);
 		}
-		// The host page's content is replaced, so its shortcode never enqueues our
-		// stylesheet — enqueue it here. wp_enqueue_scripts fires during wp_head.
+		// Enqueue our stylesheet for the themed document. wp_enqueue_scripts fires inside
+		// wp_head() (called by get_header or directly), after this template_redirect call.
 		add_action(
 			'wp_enqueue_scripts',
 			static function () {
