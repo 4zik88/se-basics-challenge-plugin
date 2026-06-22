@@ -1,6 +1,6 @@
 /* NAASE SE Basics Challenge — front-end styles */
 
-.naase-app {
+.naase-app.naase-app {
     --naase-primary: #06509e;
     --naase-primary-dark: #054488;
     --naase-accent: #127edc;
@@ -29,14 +29,14 @@
     font-size: 16px;
     line-height: 1.5;
 }
-.naase-app *,
-.naase-app *::before,
-.naase-app *::after {
+.naase-app.naase-app *,
+.naase-app.naase-app *::before,
+.naase-app.naase-app *::after {
     box-sizing: border-box;
 }
 
 /* ---- Card / screens ---- */
-.naase-card {
+.naase-app .naase-card {
     background: var(--naase-card);
     border: 1px solid var(--naase-border);
     border-radius: var(--naase-radius);
@@ -46,25 +46,25 @@
         0px 1px 4px rgba(12, 12, 13, 0.05);
     border-radius: 8px;
 }
-.naase-screen {
+.naase-app .naase-screen {
     display: none;
 }
-.naase-screen.question {
+.naase-app .naase-screen.question {
     padding: 32px;
 }
-.naase-screen.is-active {
+.naase-app .naase-screen.is-active {
     display: block;
 }
-.naase-screen-inner {
+.naase-app .naase-screen-inner {
     max-width: 914px;
     margin: 0 auto;
 }
-.naase-text-center {
+.naase-app .naase-text-center {
     text-align: center;
 }
 
 /* ---- Typography ---- */
-.naase-title {
+.naase-app .naase-title {
     font-family:
         "League Gothic", "Oswald", "Arial Narrow", "Helvetica Neue", sans-serif;
     font-weight: 400;
@@ -74,14 +74,14 @@
     margin: 0 0 24px;
     color: var(--naase-ink);
 }
-.naase-title--md {
+.naase-app .naase-title--md {
     font-size: clamp(28px, 4vw, 40px);
 }
-.naase-title--sm {
+.naase-app .naase-title--sm {
     font-size: clamp(24px, 3vw, 32px);
     margin-bottom: 8px;
 }
-.naase-lead {
+.naase-app .naase-lead {
     font-size: 20px;
     font-weight: 400;
     line-height: 1.2;
@@ -90,7 +90,7 @@
     max-width: 640px;
 }
 
-.naase-lead-result {
+.naase-app .naase-lead-result {
     font-size: 20px;
     font-weight: 400;
     line-height: 1.2;
@@ -99,44 +99,44 @@
     max-width: 640px;
 }
 
-.naase-title-completing,
-.naase-title-result {
+.naase-app .naase-title-completing,
+.naase-app .naase-title-result {
     font-size: 36px;
     font-weight: 700;
     margin: 0 0 32px;
 }
 
-.naase-title-leaderboard {
+.naase-app .naase-title-leaderboard {
     font-size: 36px;
     font-weight: 700;
     margin: 0;
 }
 
-.naase-app.naase-leaderboard .naase-card {
+.naase-app.naase-app.naase-leaderboard .naase-card {
     padding: 32px;
 }
 
 /* Form controls don't inherit font-family by default — force the Roboto stack. */
-.naase-app button,
-.naase-app input,
-.naase-app select,
-.naase-app textarea {
+.naase-app.naase-app button,
+.naase-app.naase-app input,
+.naase-app.naase-app select,
+.naase-app.naase-app textarea {
     font-family: inherit;
 }
 
 /* ---- Buttons ---- */
-.naase-actions {
+.naase-app .naase-actions {
     display: flex;
     gap: 32px;
     justify-content: center;
     flex-wrap: wrap;
     margin-top: 32px;
 }
-.naase-form .naase-actions .naase-btn {
+.naase-app .naase-form .naase-actions .naase-btn {
     padding: 21px 36px;
 }
 
-.naase-btn {
+.naase-app .naase-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -152,56 +152,56 @@
         color 0.15s,
         box-shadow 0.15s;
 }
-.naase-btn--primary {
+.naase-app .naase-btn--primary {
     background: var(--naase-primary);
     color: #fff;
 }
-.naase-btn--primary:hover {
+.naase-app .naase-btn--primary:hover {
     background: var(--naase-primary-dark);
     color: #fff;
 }
-.naase-btn--ghost {
+.naase-app .naase-btn--ghost {
     background: #fff;
     font-weight: 500;
     color: #06509E;
     border-color: #06509E;
 }
-.naase-btn--ghost:hover {
+.naase-app .naase-btn--ghost:hover {
     background: #f0f6fd;
 }
-.naase-btn--sm {
+.naase-app .naase-btn--sm {
     padding: 10px 18px;
     font-size: 14px;
 }
 
-.naase-btn--ghost .naase-btn-ico {
+.naase-app .naase-btn--ghost .naase-btn-ico {
     width: 24px;
     height: 24px;
 }
 
-.naase-btn-ico {
+.naase-app .naase-btn-ico {
     width: 20px;
     height: 20px;
     flex: none;
     margin-right: 8px;
 }
-.naase-btn-ico--after {
+.naase-app .naase-btn-ico--after {
     margin-right: 0;
     margin-left: 8px;
 }
-.naase-btn:disabled {
+.naase-app .naase-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
 
-.naase-notice,
-.naase-error-text {
+.naase-app .naase-notice,
+.naase-app .naase-error-text {
     color: var(--naase-muted);
     font-weight: 600;
 }
 
 /* ---- Feature tiles (start screen) ---- */
-.naase-features {
+.naase-app .naase-features {
     display: flex;
     gap: 16px;
     justify-content: center;
@@ -209,7 +209,7 @@
     margin: 0 auto 0;
     max-width: 1042px;
 }
-.naase-feature {
+.naase-app .naase-feature {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -223,7 +223,7 @@
     line-height: 30px;
     text-align: left;
 }
-.naase-feature-ico {
+.naase-app .naase-feature-ico {
     width: 48px;
     height: 48px;
     flex: none;
@@ -235,43 +235,43 @@
     -webkit-mask-position: center;
     mask-position: center;
 }
-.naase-ico-help {
+.naase-app .naase-ico-help {
     -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none'%3E%3Ccircle cx='24' cy='24' r='19' stroke='%23000' stroke-width='3'/%3E%3Cpath d='M19.5 19.2C19.5 16.6 21.6 14.5 24.2 14.5C26.8 14.5 28.9 16.6 28.9 19.2C28.9 21.7 27.1 22.7 25.6 23.7C24.5 24.5 24.2 25.3 24.2 26.8V27.8' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M24.2 33h0.01' stroke='%23000' stroke-width='3.4' stroke-linecap='round'/%3E%3C/svg%3E");
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none'%3E%3Ccircle cx='24' cy='24' r='19' stroke='%23000' stroke-width='3'/%3E%3Cpath d='M19.5 19.2C19.5 16.6 21.6 14.5 24.2 14.5C26.8 14.5 28.9 16.6 28.9 19.2C28.9 21.7 27.1 22.7 25.6 23.7C24.5 24.5 24.2 25.3 24.2 26.8V27.8' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M24.2 33h0.01' stroke='%23000' stroke-width='3.4' stroke-linecap='round'/%3E%3C/svg%3E");
 }
-.naase-ico-tiers {
+.naase-app .naase-ico-tiers {
     -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none'%3E%3Cpath d='M33.4995 42.5H42.4995V5.5H33.4995V11.5M33.4995 42.5H24.1885M33.4995 42.5V11.5M24.1885 42.5H14.8774M24.1885 42.5V17.5M14.8774 42.5V23.5M14.8774 42.5H5.56641V23.5H14.8774M14.8774 23.5V17.5H24.1885M33.4995 11.5H24.1885V17.5' stroke='%23000' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E");
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none'%3E%3Cpath d='M33.4995 42.5H42.4995V5.5H33.4995V11.5M33.4995 42.5H24.1885M33.4995 42.5V11.5M24.1885 42.5H14.8774M24.1885 42.5V17.5M14.8774 42.5V23.5M14.8774 42.5H5.56641V23.5H14.8774M14.8774 23.5V17.5H24.1885M33.4995 11.5H24.1885V17.5' stroke='%23000' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
-.naase-ico-badge {
+.naase-app .naase-ico-badge {
     -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none'%3E%3Cpath d='M19.4271 7.27712L19.4248 7.27906C18.3129 8.26909 16.8989 8.85613 15.4126 8.94115C13.8885 9.06316 13.1264 9.12516 12.4924 9.34917C11.7673 9.60552 11.1086 10.0207 10.5646 10.5644C10.0206 11.108 9.60503 11.7664 9.34822 12.4914C9.12421 13.1274 9.06221 13.8894 8.9402 15.4115C8.81619 16.9796 8.31816 18.2037 7.2781 19.4257L7.27617 19.428C6.2874 20.5886 5.79183 21.1702 5.502 21.7779C5.17058 22.4717 4.99839 23.2308 4.99805 23.9998C4.9977 24.7687 5.1692 25.528 5.5 26.2221C5.79202 26.8302 6.28805 27.4122 7.2801 28.5743C8.27013 29.6862 8.85517 31.1001 8.9402 32.5865C9.06221 34.1106 9.12421 34.8726 9.34822 35.5066C9.60456 36.2318 10.0197 36.8904 10.5634 37.4344C11.1071 37.9784 11.7654 38.394 12.4904 38.6508C13.1264 38.8748 13.8885 38.9368 15.4106 39.0588C16.8979 39.144 18.3126 39.7298 19.4248 40.7209L19.427 40.7228C20.5876 41.7116 21.1693 42.2072 21.7769 42.497C22.4709 42.8282 23.2301 43 23.999 43C24.768 43 25.5272 42.8282 26.2212 42.497C26.8292 42.207 27.4112 41.711 28.5733 40.7189C29.7714 39.6989 30.9854 39.1849 32.5855 39.0588C34.1096 38.9368 34.8717 38.8748 35.5057 38.6508C36.2308 38.3945 36.8895 37.9793 37.4335 37.4356C37.9775 36.892 38.3931 36.2336 38.6499 35.5086C38.8739 34.8726 38.9359 34.1106 39.0579 32.5885C39.143 31.1012 39.7288 29.6864 40.72 28.5743L40.7219 28.572C41.7107 27.4115 42.2063 26.8298 42.4961 26.2221C43.1681 24.818 43.1681 23.184 42.4961 21.7779C42.2061 21.1698 41.71 20.5878 40.718 19.4257C39.6979 18.2277 39.1839 17.0136 39.0579 15.4135C38.9359 13.8894 38.8739 13.1274 38.6499 12.4934C38.1318 11.0233 36.9758 9.8692 35.5077 9.34917C34.8717 9.12516 34.1096 9.06316 32.5875 8.94115C30.9874 8.81514 29.7714 8.29911 28.5733 7.27906L28.571 7.27713C27.4105 6.28836 26.8288 5.79279 26.2212 5.50296C25.5272 5.17184 24.768 5 23.999 5C23.2301 5 22.4709 5.17184 21.7769 5.50296C21.1693 5.79278 20.5876 6.28836 19.4271 7.27712Z' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M32.4135 19.8944H26.2658C26.1785 19.8954 26.0921 19.8766 26.0131 19.8394C25.9342 19.8023 25.8646 19.7477 25.8098 19.6798C25.7549 19.6119 25.7162 19.5324 25.6964 19.4474C25.6767 19.3624 25.6765 19.274 25.6958 19.1889C26.1758 17.1444 27.2235 12 23.6902 12C23.5183 11.999 23.3492 12.0439 23.2003 12.13C23.0515 12.2161 22.9283 12.3404 22.8436 12.49L21.4213 15.0078C20.0913 17.36 17.4036 18.3667 15.1125 19.5956C14.7691 19.78 14.5547 20.1344 14.5547 20.52V30.9477C14.5573 31.2293 14.6716 31.4982 14.8725 31.6955C15.0733 31.8928 15.3443 32.0023 15.6258 32H29.538C31.5646 32 35.2424 19.8944 32.4135 19.8944Z' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none'%3E%3Cpath d='M19.4271 7.27712L19.4248 7.27906C18.3129 8.26909 16.8989 8.85613 15.4126 8.94115C13.8885 9.06316 13.1264 9.12516 12.4924 9.34917C11.7673 9.60552 11.1086 10.0207 10.5646 10.5644C10.0206 11.108 9.60503 11.7664 9.34822 12.4914C9.12421 13.1274 9.06221 13.8894 8.9402 15.4115C8.81619 16.9796 8.31816 18.2037 7.2781 19.4257L7.27617 19.428C6.2874 20.5886 5.79183 21.1702 5.502 21.7779C5.17058 22.4717 4.99839 23.2308 4.99805 23.9998C4.9977 24.7687 5.1692 25.528 5.5 26.2221C5.79202 26.8302 6.28805 27.4122 7.2801 28.5743C8.27013 29.6862 8.85517 31.1001 8.9402 32.5865C9.06221 34.1106 9.12421 34.8726 9.34822 35.5066C9.60456 36.2318 10.0197 36.8904 10.5634 37.4344C11.1071 37.9784 11.7654 38.394 12.4904 38.6508C13.1264 38.8748 13.8885 38.9368 15.4106 39.0588C16.8979 39.144 18.3126 39.7298 19.4248 40.7209L19.427 40.7228C20.5876 41.7116 21.1693 42.2072 21.7769 42.497C22.4709 42.8282 23.2301 43 23.999 43C24.768 43 25.5272 42.8282 26.2212 42.497C26.8292 42.207 27.4112 41.711 28.5733 40.7189C29.7714 39.6989 30.9854 39.1849 32.5855 39.0588C34.1096 38.9368 34.8717 38.8748 35.5057 38.6508C36.2308 38.3945 36.8895 37.9793 37.4335 37.4356C37.9775 36.892 38.3931 36.2336 38.6499 35.5086C38.8739 34.8726 38.9359 34.1106 39.0579 32.5885C39.143 31.1012 39.7288 29.6864 40.72 28.5743L40.7219 28.572C41.7107 27.4115 42.2063 26.8298 42.4961 26.2221C43.1681 24.818 43.1681 23.184 42.4961 21.7779C42.2061 21.1698 41.71 20.5878 40.718 19.4257C39.6979 18.2277 39.1839 17.0136 39.0579 15.4135C38.9359 13.8894 38.8739 13.1274 38.6499 12.4934C38.1318 11.0233 36.9758 9.8692 35.5077 9.34917C34.8717 9.12516 34.1096 9.06316 32.5875 8.94115C30.9874 8.81514 29.7714 8.29911 28.5733 7.27906L28.571 7.27713C27.4105 6.28836 26.8288 5.79279 26.2212 5.50296C25.5272 5.17184 24.768 5 23.999 5C23.2301 5 22.4709 5.17184 21.7769 5.50296C21.1693 5.79278 20.5876 6.28836 19.4271 7.27712Z' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M32.4135 19.8944H26.2658C26.1785 19.8954 26.0921 19.8766 26.0131 19.8394C25.9342 19.8023 25.8646 19.7477 25.8098 19.6798C25.7549 19.6119 25.7162 19.5324 25.6964 19.4474C25.6767 19.3624 25.6765 19.274 25.6958 19.1889C26.1758 17.1444 27.2235 12 23.6902 12C23.5183 11.999 23.3492 12.0439 23.2003 12.13C23.0515 12.2161 22.9283 12.3404 22.8436 12.49L21.4213 15.0078C20.0913 17.36 17.4036 18.3667 15.1125 19.5956C14.7691 19.78 14.5547 20.1344 14.5547 20.52V30.9477C14.5573 31.2293 14.6716 31.4982 14.8725 31.6955C15.0733 31.8928 15.3443 32.0023 15.6258 32H29.538C31.5646 32 35.2424 19.8944 32.4135 19.8944Z' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
-.naase-ico-star {
+.naase-app .naase-ico-star {
     -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000'%3E%3Cpath d='M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z'/%3E%3C/svg%3E");
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000'%3E%3Cpath d='M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z'/%3E%3C/svg%3E");
 }
 
 /* ============ QUESTION SCREEN ============ */
-.naase-q {
+.naase-app .naase-q {
     display: grid;
     grid-template-columns: 1fr 240px;
     gap: 28px;
 }
-.naase-q-progress {
+.naase-app .naase-q-progress {
     display: flex;
     align-items: center;
     gap: 12px;
     margin-bottom: 24px;
 }
-.naase-q-count {
+.naase-app .naase-q-count {
     font-size: 18px;
     font-weight: 400;
     line-height: 30px;
     white-space: nowrap;
     color: #2d2c34;
 }
-.naase-bar {
+.naase-app .naase-bar {
     display: block;
     flex: 1;
     height: 6px;
@@ -279,7 +279,7 @@
     background: var(--naase-track);
     overflow: hidden;
 }
-.naase-bar-fill {
+.naase-app .naase-bar-fill {
     display: block;
     height: 100%;
     min-width: 2px;
@@ -287,18 +287,18 @@
     border-radius: 6px;
     transition: width 0.3s;
 }
-.naase-q-text {
+.naase-app .naase-q-text {
     font-size: 24px;
     font-weight: 700;
     margin: 0 0 24px;
 }
 
-.naase-options {
+.naase-app .naase-options {
     display: flex;
     flex-direction: column;
     gap: 14px;
 }
-.naase-option {
+.naase-app .naase-option {
     display: flex;
     align-items: center;
     gap: 16px;
@@ -313,13 +313,13 @@
         border-color 0.12s,
         box-shadow 0.12s;
 }
-.naase-option:hover {
+.naase-app .naase-option:hover {
     border-color: #c3d4ea;
 }
-.naase-option:focus {
+.naase-app .naase-option:focus {
     outline: none;
 }
-.naase-option-letter {
+.naase-app .naase-option-letter {
     width: 40px;
     height: 40px;
     flex: none;
@@ -332,14 +332,14 @@
     font-weight: 700;
     color: var(--naase-ink);
 }
-.naase-option-text {
+.naase-app .naase-option-text {
     flex: 1;
     font-size: 15px;
     line-height: 22px;
     font-weight: 600;
     color: #2d2c34;
 }
-.naase-option-radio {
+.naase-app .naase-option-radio {
     width: 24px;
     height: 24px;
     flex: none;
@@ -349,18 +349,18 @@
     background-position: center;
     background-size: 13px 11px;
 }
-.naase-option.is-selected .naase-option-radio {
+.naase-app .naase-option.is-selected .naase-option-radio {
     background-color: #127edc;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='13' viewBox='0 0 16 13' fill='none'%3E%3Cpath d='M6.12668 12.1844C5.97396 12.3381 5.76557 12.4238 5.54912 12.4238C5.33268 12.4238 5.12428 12.3381 4.97156 12.1844L0.359012 7.57112C-0.119671 7.09244 -0.119671 6.3162 0.359012 5.83844L0.936572 5.26073C1.41541 4.78204 2.19072 4.78204 2.6694 5.26073L5.54916 8.1406L13.3305 0.359012C13.8094 -0.119671 14.5854 -0.119671 15.0634 0.359012L15.6409 0.936725C16.1196 1.41541 16.1196 2.19149 15.6409 2.6694L6.12668 12.1844Z' fill='%23fff'/%3E%3C/svg%3E");
 }
 
 /* Sidebar */
-.naase-q-side {
+.naase-app .naase-q-side {
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
-.naase-side-card {
+.naase-app .naase-side-card {
     border: 1px solid #e8eef3;
     border-radius: 6px;
     padding: 16px 20px;
@@ -368,7 +368,7 @@
     gap: 12px;
     align-items: center;
 }
-.naase-side-ico {
+.naase-app .naase-side-ico {
     width: 48px;
     height: 48px;
     flex: none;
@@ -378,16 +378,16 @@
     border: 1px solid #e8eef3;
     -webkit-mask: none;
 }
-.naase-side-ico.naase-side-ico--info {
+.naase-app .naase-side-ico.naase-side-ico--info {
     background: none;
     border: none;
     width: 24px;
     height: 24px;
 }
-.naase-side-ico.naase-side-ico--info::after {
+.naase-app .naase-side-ico.naase-side-ico--info::after {
     inset: 0;
 }
-.naase-side-ico::after {
+.naase-app .naase-side-ico::after {
     content: "";
     position: absolute;
     inset: 12px;
@@ -399,53 +399,53 @@
     -webkit-mask-position: center;
     mask-position: center;
 }
-.naase-side-ico--clock::after {
+.naase-app .naase-side-ico--clock::after {
     -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 6V12L16 10'/%3E%3Cpath d='M21 12C21 13.1819 20.7672 14.3522 20.3149 15.4442C19.8626 16.5361 19.1997 17.5282 18.364 18.364C17.5282 19.1997 16.5361 19.8626 15.4442 20.3149C14.3522 20.7672 13.1819 21 12 21C10.8181 21 9.64778 20.7672 8.55585 20.3149C7.46392 19.8626 6.47177 19.1997 5.63604 18.364C4.80031 17.5282 4.13738 16.5361 3.68508 15.4442C3.23279 14.3522 3 13.1819 3 12C3 9.61305 3.94821 7.32387 5.63604 5.63604C7.32387 3.94821 9.61305 3 12 3C14.3869 3 16.6761 3.94821 18.364 5.63604C20.0518 7.32387 21 9.61305 21 12Z'/%3E%3C/svg%3E");
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 6V12L16 10'/%3E%3Cpath d='M21 12C21 13.1819 20.7672 14.3522 20.3149 15.4442C19.8626 16.5361 19.1997 17.5282 18.364 18.364C17.5282 19.1997 16.5361 19.8626 15.4442 20.3149C14.3522 20.7672 13.1819 21 12 21C10.8181 21 9.64778 20.7672 8.55585 20.3149C7.46392 19.8626 6.47177 19.1997 5.63604 18.364C4.80031 17.5282 4.13738 16.5361 3.68508 15.4442C3.23279 14.3522 3 13.1819 3 12C3 9.61305 3.94821 7.32387 5.63604 5.63604C7.32387 3.94821 9.61305 3 12 3C14.3869 3 16.6761 3.94821 18.364 5.63604C20.0518 7.32387 21 9.61305 21 12Z'/%3E%3C/svg%3E");
 }
-.naase-side-ico--book::after {
+.naase-app .naase-side-ico--book::after {
     -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12.0004 20V9.8C12.0004 8.096 12.1074 6.216 10.3624 5.327C9.72044 5 8.88044 5 7.20044 5H4.60044C3.36444 5 3.00044 5.437 3.00044 6.6V15.4C3.00044 15.968 2.96444 16.595 3.54644 16.891C3.76044 17 4.03944 17 4.59844 17H7.43044C9.80744 17 10.6904 18.036 11.9994 20C13.3094 18.036 14.1924 17 16.5694 17H19.4024C19.9614 17 20.2414 17 20.4544 16.891C21.0354 16.595 21.0004 15.967 21.0004 15.4V6.6C21.0004 5.436 20.6354 5 19.4004 5H16.8004C15.1204 5 14.2794 5 13.6374 5.327C11.8914 6.216 11.9994 8.096 11.9994 9.8'/%3E%3C/svg%3E");
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12.0004 20V9.8C12.0004 8.096 12.1074 6.216 10.3624 5.327C9.72044 5 8.88044 5 7.20044 5H4.60044C3.36444 5 3.00044 5.437 3.00044 6.6V15.4C3.00044 15.968 2.96444 16.595 3.54644 16.891C3.76044 17 4.03944 17 4.59844 17H7.43044C9.80744 17 10.6904 18.036 11.9994 20C13.3094 18.036 14.1924 17 16.5694 17H19.4024C19.9614 17 20.2414 17 20.4544 16.891C21.0354 16.595 21.0004 15.967 21.0004 15.4V6.6C21.0004 5.436 20.6354 5 19.4004 5H16.8004C15.1204 5 14.2794 5 13.6374 5.327C11.8914 6.216 11.9994 8.096 11.9994 9.8'/%3E%3C/svg%3E");
 }
-.naase-side-ico--info::after {
+.naase-app .naase-side-ico--info::after {
     -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 11.25V16.25'/%3E%3Cpath d='M12 8h0.01'/%3E%3C/svg%3E");
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 11.25V16.25'/%3E%3Cpath d='M12 8h0.01'/%3E%3C/svg%3E");
 }
-.naase-side-label {
+.naase-app .naase-side-label {
     font-size: 12px;
     font-weight: 600;
     line-height: 22px;
     color: #2d2c34;
 }
-.naase-side-value {
+.naase-app .naase-side-value {
     font-weight: 700;
     font-size: 16px;
     line-height: 1.2;
 }
-.naase-side-time {
+.naase-app .naase-side-time {
     font-size: 24px;
     font-weight: 700;
     line-height: 1.2;
 }
-.naase-side-card--context {
+.naase-app .naase-side-card--context {
     flex-direction: column;
     gap: 12px;
     align-items: flex-start;
 }
-.naase-side-context-head {
+.naase-app .naase-side-context-head {
     display: flex;
     align-items: center;
     gap: 10px;
     font-size: 15px;
     font-weight: 600;
 }
-.naase-side-context-body {
+.naase-app .naase-side-context-body {
     font-size: 14px;
     font-weight: 400;
     color: #2d2c34;
     line-height: 1.2;
 }
-.naase-q-next {
+.naase-app .naase-q-next {
     width: 100%;
     font-weight: 600;
     font-size: 14px;
@@ -456,7 +456,7 @@
 }
 
 /* ============ CONTACT FORM ============ */
-.naase-result-strip {
+.naase-app .naase-result-strip {
     display: flex;
     justify-content: center;
     gap: 0;
@@ -467,7 +467,7 @@
     margin: 0 auto 32px;
     overflow: hidden;
 }
-.naase-stat {
+.naase-app .naase-stat {
     position: relative;
     display: flex;
     align-items: center;
@@ -475,7 +475,7 @@
     padding: 16px 20px;
     flex: 0 0 auto;
 }
-.naase-stat + .naase-stat::before {
+.naase-app .naase-stat + .naase-stat::before {
     content: "";
     position: absolute;
     left: 0;
@@ -484,19 +484,19 @@
     width: 1px;
     background: #E8EEF3;
 }
-.naase-stat-ico {
+.naase-app .naase-stat-ico {
     width: 48px;
     height: 48px;
     flex: none;
 }
-.naase-stat-label {
+.naase-app .naase-stat-label {
     font-size: 12px;
     line-height: 14px;
     font-weight: 600;
     color: #5b5a6f;
     text-align: start;
 }
-.naase-stat-value {
+.naase-app .naase-stat-value {
     font-weight: 700;
     font-size: 24px;
     text-align: start;
@@ -504,12 +504,12 @@
     white-space: nowrap;
 }
 
-.naase-form {
+.naase-app .naase-form {
     max-width: 452px;
     margin: 0 auto;
     text-align: start;
 }
-.naase-form-intro {
+.naase-app .naase-form-intro {
     text-align: start;
     font-weight: 400;
     font-size: 20px;
@@ -517,7 +517,7 @@
     margin-bottom: 24px;
     color: #2D2C34;
 }
-.naase-field {
+.naase-app .naase-field {
     width: 100%;
     background: #F4F8FD;
     border-radius: 8px;
@@ -530,21 +530,21 @@
     border: none;
 }
 
-.naase-field::placeholder {
+.naase-app .naase-field::placeholder {
     color: #86909A;
 }
 
-.naase-field:focus {
+.naase-app .naase-field:focus {
     outline: none;
     background: #F4F8FD;
 }
 
-.naase-field--error {
+.naase-app .naase-field--error {
     box-shadow: inset 0 0 0 1.5px #c0392b;
     background: #fdf3f2;
 }
 
-.naase-check {
+.naase-app .naase-check {
     display: flex;
     align-items: flex-start;
     gap: 8px;
@@ -556,7 +556,7 @@
     color: #2D2C34;
 }
 
-.naase-check input {
+.naase-app .naase-check input {
     width: 18px;
     height: 18px;
     flex: none;
@@ -564,11 +564,11 @@
     margin: 2px 0 0;
 }
 
-.naase-check input:focus {
+.naase-app .naase-check input:focus {
     outline: none;
 }
 
-.naase-hp {
+.naase-app .naase-hp {
     position: absolute !important;
     left: -9999px !important;
     height: 0;
@@ -576,11 +576,11 @@
     overflow: hidden;
 }
 
-.naase-form .naase-actions {
+.naase-app .naase-form .naase-actions {
     margin-top: 16px;
 }
 
-.naase-privacy {
+.naase-app .naase-privacy {
     display: flex;
     gap: 16px;
     align-items: center;
@@ -594,12 +594,12 @@
     margin-left: auto;
     margin-right: auto;
 }
-.naase-privacy-ico {
+.naase-app .naase-privacy-ico {
     width: 24px;
     height: 24px;
     flex: none;
 }
-.naase-form-error {
+.naase-app .naase-form-error {
     color: #c0392b;
     font-weight: 600;
     text-align: center;
@@ -607,7 +607,7 @@
 }
 
 /* ============ RESULT / SHARE ============ */
-.naase-share {
+.naase-app .naase-share {
     border: 1px solid #E8EEF3;
     border-radius: 12px;
     padding: 24px;
@@ -615,14 +615,14 @@
     margin: 0 auto 0;
     text-align: left;
 }
-.naase-share-head {
+.naase-app .naase-share-head {
     font-weight: 600;
     font-size: 18px;
     line-height: 30px;
     color: #2D2C34;
     margin-bottom: 16px;
 }
-.naase-share-body {
+.naase-app .naase-share-body {
     display: flex;
     border: 1px solid #D0DEE7;
     border-radius: 8px;
@@ -631,54 +631,54 @@
     align-items: center;
 }
 
-.naase-share-body .naase-share-text {
+.naase-app .naase-share-body .naase-share-text {
     font-weight: 400;
     font-size: 16px;
     color: #2D2C34;
 }
 
-.naase-share-body .naase-share-text strong {
+.naase-app .naase-share-body .naase-share-text strong {
     font-weight: 500;
 }
 
-.naase-share-body .naase-share-text a {
+.naase-app .naase-share-body .naase-share-text a {
     color: #06509E;
     text-decoration: none;
     font-weight: 400;
     font-size: 16px;
 }
 
-.naase-share-badge {
+.naase-app .naase-share-badge {
     flex: none;
 }
-.naase-share-badge img {
+.naase-app .naase-share-badge img {
     width: 200px;
     height: auto;
     display: block;
 }
-.naase-share-text p {
+.naase-app .naase-share-text p {
     margin: 0 0 2px;
 }
-.naase-share-link {
+.naase-app .naase-share-link {
     color: var(--naase-accent);
     word-break: break-all;
     font-size: 14px;
 }
-.naase-share-actions {
+.naase-app .naase-share-actions {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 12px;
     margin-top: 16px;
 }
-.naase-share-social {
+.naase-app .naase-share-social {
     display: flex;
     flex-wrap: wrap;
     gap: 24px;
     padding-right: 24px;
     border-right: 1px solid #E8EEF3;
 }
-.naase-share-btn {
+.naase-app .naase-share-btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -691,21 +691,21 @@
     background: #E1EEFD;
     transition: background 0.15s;
 }
-.naase-share-btn:hover {
+.naase-app .naase-share-btn:hover {
     background: #E1EEFD;
 }
-.naase-share-ico {
+.naase-app .naase-share-ico {
     width: 20px;
     height: 20px;
     flex: none;
 }
-.naase-share-btn--download {
+.naase-app .naase-share-btn--download {
     color: var(--naase-primary);
     background: none;
 }
 
 /* ============ LEADERBOARD ============ */
-.naase-lb-head {
+.naase-app .naase-lb-head {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -713,7 +713,7 @@
     margin-bottom: 32px;
     flex-wrap: wrap;
 }
-.naase-lb-sub {
+.naase-app .naase-lb-sub {
     font-weight: 400;
     font-size: 14px;
     color: #2D2C34;
@@ -721,25 +721,25 @@
     max-width: 895px;
 }
 
-.naase-btn.leaderboard {
+.naase-app .naase-btn.leaderboard {
     padding: 8px 16px;
     font-weight: 600;
     font-size: 14px;
     gap: 8px;
 }
 
-.naase-lb-table-wrap {
+.naase-app .naase-lb-table-wrap {
     overflow-x: auto;
     border: 1px solid var(--naase-border);
     border-radius: 12px;
 }
-.naase-lb-table {
+.naase-app .naase-lb-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 15px;
 }
 
-.naase-lb-table th {
+.naase-app .naase-lb-table th {
     text-align: left;
     background: #ffffff;
     font-weight: 600;
@@ -749,37 +749,37 @@
     padding: 16px 20px;
     white-space: nowrap;
 }
-.naase-lb-table td {
+.naase-app .naase-lb-table td {
     padding: 16px 20px;
 }
 
-.naase-lb-table td.naase-col-name{
+.naase-app .naase-lb-table td.naase-col-name{
     color: #2D2C34;
     font-weight: 600;
     font-size: 14px;
     line-height: 14px;
 }
 
-.naase-lb-table td.naase-col-score {
+.naase-app .naase-lb-table td.naase-col-score {
     font-weight: 600;
     font-size: 20px;
     line-height: 14px;
     color: #2D2C34;
 }
 
-.naase-lb-table td.naase-col-tier,
-.naase-lb-table td.naase-col-duration,
-.naase-lb-table td.naase-col-date {
+.naase-app .naase-lb-table td.naase-col-tier,
+.naase-app .naase-lb-table td.naase-col-duration,
+.naase-app .naase-lb-table td.naase-col-date {
     font-weight: 600;
     font-size: 14px;
     line-height: 14px;
     color: #2D2C34;
 }
 
-.naase-lb-table tbody tr:nth-child(odd) {
+.naase-app .naase-lb-table tbody tr:nth-child(odd) {
     background: #F7F8F8;
 }
-.naase-lb-table .naase-col-rank {
+.naase-app .naase-lb-table .naase-col-rank {
     width: 64px;
     font-weight: 600;
     font-size: 14px;
@@ -787,30 +787,30 @@
     color: #2D2C34;
 }
 
-.naase-lb-table .naase-col-rank.value {
+.naase-app .naase-lb-table .naase-col-rank.value {
     font-weight: 600;
     font-size: 20px;
     line-height: 14px;
     color: #2D2C34;
 }
 
-.naase-lb-table .naase-col-score {
+.naase-app .naase-lb-table .naase-col-score {
     font-weight: 700;
     font-size: 17px;
 }
-.naase-lb-empty {
+.naase-app .naase-lb-empty {
     color: var(--naase-muted);
     text-align: center;
     padding: 40px 0;
 }
-.naase-pagination {
+.naase-app .naase-pagination {
     display: flex;
     gap: 8px;
     justify-content: center;
     align-items: center;
     margin-top: 32px;
 }
-.naase-page {
+.naase-app .naase-page {
     display: inline-flex;
     min-width: 38px;
     height: 36px;
@@ -825,62 +825,62 @@
     font-weight: 600;
     font-size: 14px;
 }
-.naase-page--step {
+.naase-app .naase-page--step {
     padding: 0 16px;
     color: #06509E;
 }
-.naase-page-arrow {
+.naase-app .naase-page-arrow {
     display: inline-flex;
     align-items: center;
     color: var(--naase-primary);
 }
-.naase-page-ico {
+.naase-app .naase-page-ico {
     width: 20px;
     height: 20px;
     display: block;
 }
-.naase-page.is-disabled .naase-page-arrow {
+.naase-app .naase-page.is-disabled .naase-page-arrow {
     color: #B6B6C3;
 }
-.naase-page.is-current {
+.naase-app .naase-page.is-current {
     background: var(--naase-ink);
     color: #fff;
     border-color: var(--naase-ink);
 }
-.naase-page.is-disabled {
+.naase-app .naase-page.is-disabled {
     color: #B6B6C3;
     border-color: #B6B6C3;
     cursor: default;
 }
-.naase-page:not(.is-current):not(.is-disabled):hover {
+.naase-app .naase-page:not(.is-current):not(.is-disabled):hover {
     background: #f0f6fd;
 }
 
 /* ============ RESPONSIVE ============ */
-@media (max-width: 860px) {
-    .naase-share-social {
+.naase-app @media (max-width: 860px) {
+    .naase-app .naase-share-social {
         justify-content: center;
         padding-right: 0;
     }
 
-    .naase-share-actions {
+    .naase-app .naase-share-actions {
         justify-content: center;
     }
 
-    .naase-card {
+    .naase-app .naase-card {
         padding: 28px 20px;
     }
-    .naase-q {
+    .naase-app .naase-q {
         grid-template-columns: 1fr;
     }
-    .naase-q-next {
+    .naase-app .naase-q-next {
         margin-top: 0;
     }
-    .naase-result-strip {
+    .naase-app .naase-result-strip {
         flex-direction: column;
         width: auto;
     }
-    .naase-stat + .naase-stat::before {
+    .naase-app .naase-stat + .naase-stat::before {
         left: 16px;
         right: 16px;
         top: 0;
@@ -888,11 +888,11 @@
         width: auto;
         height: 1px;
     }
-    .naase-share-body {
+    .naase-app .naase-share-body {
         flex-direction: column;
         text-align: center;
     }
-    .naase-share-badge img {
+    .naase-app .naase-share-badge img {
         width: 200px;
         margin: 0 auto;
     }
