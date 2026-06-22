@@ -63,6 +63,15 @@
 		return transportPromise;
 	}
 
+	// Warm the probe at page load so it resolves while the visitor reads the start
+	// screen — by the time they click Start the transport is known, no added latency.
+	pickTransport();
+
+	// '/submit-form' → 'naase_submit_form'
+	function actionFor(path) {
+		return 'naase_' + path.replace(/^\//, '').replace(/-/g, '_');
+	}
+
 	function handleResponse(res) {
 		return res.json().then(function (data) {
 			if (!res.ok) {
@@ -86,10 +95,8 @@
 	}
 
 	function ajaxCall(path, body) {
-		// '/submit-form' → 'naase_submit_form'
-		var action = 'naase_' + path.replace(/^\//, '').replace(/-/g, '_');
 		var fd = new FormData();
-		fd.append('action', action);
+		fd.append('action', actionFor(path));
 		fd.append('_wpnonce', CFG.nonce);
 		fd.append('payload', JSON.stringify(body || {}));
 		return fetch(CFG.ajaxUrl, {
@@ -185,7 +192,7 @@
 			if (navigator.sendBeacon) {
 				if (transport === 'ajax') {
 					var fd = new FormData();
-					fd.append('action', 'naase_' + path.replace(/^\//, '').replace(/-/g, '_'));
+					fd.append('action', actionFor(path));
 					fd.append('_wpnonce', CFG.nonce);
 					fd.append('payload', JSON.stringify(body || {}));
 					navigator.sendBeacon(CFG.ajaxUrl, fd);

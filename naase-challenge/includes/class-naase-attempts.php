@@ -659,6 +659,65 @@ class NAASE_Attempts {
 	}
 
 	/**
+	 * Valid attempt statuses; anything else falls back to 'completed'.
+	 *
+	 * @param string $status Candidate status.
+	 * @return string
+	 */
+	public static function valid_status( $status ) {
+		$allowed = array( 'completed', 'in_progress', 'timed_out', 'abandoned' );
+		return in_array( $status, $allowed, true ) ? $status : 'completed';
+	}
+
+	/**
+	 * Create a complete, leaderboard-ready attempt row from loose data (the admin
+	 * "Add entry" form and the CSV/JSON importer). Generates the token, derives the
+	 * tier from the score and started_at from the completion date minus the duration,
+	 * and defaults the date to "now".
+	 *
+	 * @param array $d first_name, last_name, email, linkedin, status, score (int|''),
+	 *                 duration_seconds, finished_at (MySQL UTC or ''), join_leaderboard.
+	 * @return int New row id.
+	 */
+	public static function create_manual( array $d ) {
+		$score = ( isset( $d['score'] ) && '' !== $d['score'] && null !== $d['score'] )
+			? max( 0, min( NAASE_QUESTIONS_PER_ATTEMPT, (int) $d['score'] ) )
+			: null;
+		$duration = max( 0, (int) ( $d['duration_seconds'] ?? 0 ) );
+
+		$finished_at = (string) ( $d['finished_at'] ?? '' );
+		if ( '' === $finished_at ) {
+			$finished_at = current_time( 'mysql', true ); // GMT.
+		}
+		$started_at = self::mysql_from_ts( strtotime( $finished_at . ' UTC' ) - $duration );
+		$now        = current_time( 'mysql' );
+
+		global $wpdb;
+		$wpdb->insert( // phpcs:ignore WordPress.DB
+			NAASE_DB::attempts(),
+			array(
+				'token'               => self::generate_token(),
+				'status'              => self::valid_status( $d['status'] ?? 'completed' ),
+				'first_name'          => sanitize_text_field( $d['first_name'] ?? '' ),
+				'last_name'           => sanitize_text_field( $d['last_name'] ?? '' ),
+				'email'               => sanitize_email( $d['email'] ?? '' ),
+				'linkedin'            => esc_url_raw( $d['linkedin'] ?? '' ),
+				'score'               => $score,
+				'tier'                => null !== $score ? NAASE_Scoring::tier( $score ) : null,
+				'duration_seconds'    => $duration,
+				'started_at'          => $started_at,
+				'finished_at'         => $finished_at,
+				'join_leaderboard'    => ! empty( $d['join_leaderboard'] ) ? 1 : 0,
+				'membership_interest' => 0,
+				'answers_string'      => '',
+				'created_at'          => $now,
+				'updated_at'          => $now,
+			)
+		);
+		return (int) $wpdb->insert_id;
+	}
+
+	/**
 	 * Public result URL for a token.
 	 *
 	 * @param string $token Token.
