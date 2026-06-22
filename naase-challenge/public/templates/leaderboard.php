@@ -65,17 +65,17 @@ $page_link = static function ( $p ) {
 			<?php if ( $pages > 1 ) : ?>
 				<nav class="naase-pagination">
 					<?php if ( $paged > 1 ) : ?>
-						<a class="naase-page naase-page--step" href="<?php echo $page_link( $paged - 1 ); // phpcs:ignore ?>"><span class="naase-page-arrow" aria-hidden="true"><svg class="naase-page-ico" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span> <?php esc_html_e( 'Previous', 'naase-challenge' ); ?></a>
+						<a class="naase-page naase-page--step" href="<?php echo $page_link( $paged - 1 ); // phpcs:ignore ?>"><span class="naase-page-arrow" aria-hidden="true"><svg class="naase-page-ico" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span> <span class="naase-page-label"><?php esc_html_e( 'Previous', 'naase-challenge' ); ?></span></a>
 						<?php else : ?>
-							<span class="naase-page naase-page--step is-disabled"><span class="naase-page-arrow" aria-hidden="true"><svg class="naase-page-ico" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span> <?php esc_html_e( 'Previous', 'naase-challenge' ); ?></span>
+							<span class="naase-page naase-page--step is-disabled"><span class="naase-page-arrow" aria-hidden="true"><svg class="naase-page-ico" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span> <span class="naase-page-label"><?php esc_html_e( 'Previous', 'naase-challenge' ); ?></span></span>
 					<?php endif; ?>
 					<?php for ( $p = 1; $p <= $pages; $p++ ) : ?>
 						<a class="naase-page <?php echo $p === $paged ? 'is-current' : ''; ?>" href="<?php echo $page_link( $p ); // phpcs:ignore ?>"><?php echo (int) $p; ?></a>
 					<?php endfor; ?>
 					<?php if ( $paged < $pages ) : ?>
-						<a class="naase-page naase-page--step" href="<?php echo $page_link( $paged + 1 ); // phpcs:ignore ?>"><?php esc_html_e( 'Next', 'naase-challenge' ); ?> <span class="naase-page-arrow" aria-hidden="true"><svg class="naase-page-ico" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+						<a class="naase-page naase-page--step" href="<?php echo $page_link( $paged + 1 ); // phpcs:ignore ?>"><span class="naase-page-label"><?php esc_html_e( 'Next', 'naase-challenge' ); ?></span> <span class="naase-page-arrow" aria-hidden="true"><svg class="naase-page-ico" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
 						<?php else : ?>
-							<span class="naase-page naase-page--step is-disabled"><?php esc_html_e( 'Next', 'naase-challenge' ); ?> <span class="naase-page-arrow" aria-hidden="true"><svg class="naase-page-ico" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+							<span class="naase-page naase-page--step is-disabled"><span class="naase-page-label"><?php esc_html_e( 'Next', 'naase-challenge' ); ?></span> <span class="naase-page-arrow" aria-hidden="true"><svg class="naase-page-ico" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
 					<?php endif; ?>
 				</nav>
 			<?php endif; ?>
