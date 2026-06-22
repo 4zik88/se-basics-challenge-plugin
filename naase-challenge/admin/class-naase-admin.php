@@ -24,6 +24,8 @@ class NAASE_Admin {
 		add_action( 'admin_post_naase_export_questions', array( __CLASS__, 'handle_export_questions' ) );
 		add_action( 'admin_post_naase_save_attempt', array( __CLASS__, 'handle_save_attempt' ) );
 		add_action( 'admin_post_naase_delete_attempt', array( __CLASS__, 'handle_delete_attempt' ) );
+		add_action( 'admin_post_naase_import_attempts', array( __CLASS__, 'handle_import_attempts' ) );
+		add_action( 'admin_post_naase_export_attempts', array( __CLASS__, 'handle_export_attempts' ) );
 	}
 
 	/* ===================== Menu ===================== */
@@ -68,7 +70,9 @@ class NAASE_Admin {
 				'question_deleted' => 'Question deleted.',
 				'imported'         => 'Questions imported.',
 				'attempt_saved'    => 'Entry updated.',
+				'attempt_added'    => 'Entry added.',
 				'attempt_deleted'  => 'Entry deleted.',
+				'entries_imported' => 'Entries imported.',
 				'error'            => 'Something went wrong.',
 			);
 			$key = sanitize_key( wp_unslash( $_GET['naase_msg'] ) ); // phpcs:ignore WordPress.Security.NonceVerification
@@ -84,6 +88,14 @@ class NAASE_Admin {
 						: sprintf( 'Imported %d question(s).', $imported );
 					if ( $skipped > 0 ) {
 						$text .= sprintf( ' Skipped %d duplicate(s).', $skipped );
+					}
+				}
+				if ( 'entries_imported' === $key ) {
+					$imported = isset( $_GET['imported'] ) ? (int) $_GET['imported'] : 0; // phpcs:ignore WordPress.Security.NonceVerification
+					$skipped  = isset( $_GET['skipped'] ) ? (int) $_GET['skipped'] : 0; // phpcs:ignore WordPress.Security.NonceVerification
+					$text     = sprintf( 'Imported %d entr%s.', $imported, 1 === $imported ? 'y' : 'ies' );
+					if ( $skipped > 0 ) {
+						$text .= sprintf( ' Skipped %d row(s) without a name.', $skipped );
 					}
 				}
 				printf( '<div class="notice %s is-dismissible"><p>%s</p></div>', esc_attr( $class ), esc_html( $text ) );
@@ -365,6 +377,10 @@ class NAASE_Admin {
 			self::render_attempt_form( $edit_id );
 			return;
 		}
+		if ( isset( $_GET['add'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+			self::render_attempt_form( 0 );
+			return;
+		}
 
 		global $wpdb;
 		$paged    = isset( $_GET['paged'] ) ? max( 1, (int) $_GET['paged'] ) : 1; // phpcs:ignore WordPress.Security.NonceVerification
@@ -376,11 +392,25 @@ class NAASE_Admin {
 		$pages    = (int) ceil( $total / $per_page );
 		?>
 		<div class="wrap naase-admin">
-			<h1>Leaderboard &amp; Responses</h1>
+			<h1>Leaderboard &amp; Responses
+				<a href="<?php echo esc_url( admin_url( 'admin.php?page=naase-responses&add=1' ) ); ?>" class="page-title-action">Add entry</a>
+			</h1>
 			<?php self::nav( 'naase-responses' ); ?>
 			<?php self::notice(); ?>
 
 			<p class="description">All attempts are listed for internal use (including partial / timed-out). Only <strong>completed</strong> attempts with “Join the Leaderboard” appear on the public leaderboard.</p>
+
+			<div class="naase-import-export">
+				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" enctype="multipart/form-data" style="display:inline-block;margin-right:20px;">
+					<input type="hidden" name="action" value="naase_import_attempts">
+					<?php wp_nonce_field( 'naase_import_attempts' ); ?>
+					<input type="file" name="naase_file" accept=".csv,.json" required>
+					<?php submit_button( 'Import CSV / JSON', 'secondary', 'submit', false ); ?>
+					<p class="description" style="margin:6px 0 0;">Adds past participants. Columns: <code>name</code> (or <code>first_name</code>/<code>last_name</code>), <code>email</code>, <code>score</code>, <code>duration_seconds</code> (completion time, in seconds), <code>finished_at</code> (date), <code>join_leaderboard</code> (1/0), <code>linkedin</code>.</p>
+				</form>
+				<a class="button" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=naase_export_attempts&format=csv' ), 'naase_export_attempts' ) ); ?>">Export CSV</a>
+				<a class="button" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=naase_export_attempts&format=json' ), 'naase_export_attempts' ) ); ?>">Export JSON</a>
+			</div>
 
 			<table class="wp-list-table widefat fixed striped">
 				<thead><tr>
@@ -418,14 +448,40 @@ class NAASE_Admin {
 	}
 
 	private static function render_attempt_form( $id ) {
-		$r = NAASE_Attempts::get_row_by_id( $id );
-		if ( ! $r ) {
-			echo '<div class="wrap"><p>Entry not found.</p></div>';
-			return;
+		$is_new = ( 0 === (int) $id );
+		if ( $is_new ) {
+			$r = array(
+				'id'               => 0,
+				'first_name'       => '',
+				'last_name'        => '',
+				'email'            => '',
+				'linkedin'         => '',
+				'score'            => '',
+				'status'           => 'completed',
+				'duration_seconds' => 0,
+				'finished_at'      => '',
+				'join_leaderboard' => 1,
+			);
+		} else {
+			$r = NAASE_Attempts::get_row_by_id( $id );
+			if ( ! $r ) {
+				echo '<div class="wrap"><p>Entry not found.</p></div>';
+				return;
+			}
 		}
+
+		$dur     = (int) ( $r['duration_seconds'] ?? 0 );
+		$dur_min = intdiv( $dur, 60 );
+		$dur_sec = $dur % 60;
+		$statuses = array(
+			'completed'   => 'Completed',
+			'in_progress' => 'In progress',
+			'timed_out'   => 'Timed out',
+			'abandoned'   => 'Abandoned',
+		);
 		?>
 		<div class="wrap naase-admin">
-			<h1>Edit Entry #<?php echo (int) $r['id']; ?></h1>
+			<h1><?php echo $is_new ? 'Add Entry' : 'Edit Entry #' . (int) $r['id']; ?></h1>
 			<?php self::nav( 'naase-responses' ); ?>
 
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
@@ -438,13 +494,23 @@ class NAASE_Admin {
 					<tr><th><label>Last name</label></th><td><input class="regular-text" name="last_name" value="<?php echo esc_attr( $r['last_name'] ); ?>"></td></tr>
 					<tr><th><label>Email</label></th><td><input class="regular-text" type="email" name="email" value="<?php echo esc_attr( $r['email'] ); ?>"></td></tr>
 					<tr><th><label>LinkedIn</label></th><td><input class="regular-text" name="linkedin" value="<?php echo esc_attr( $r['linkedin'] ); ?>"></td></tr>
-					<tr><th><label>Score</label></th><td><input type="number" min="0" max="<?php echo (int) NAASE_QUESTIONS_PER_ATTEMPT; ?>" name="score" value="<?php echo esc_attr( $r['score'] ); ?>"></td></tr>
+					<tr><th><label>Status</label></th><td><select name="status">
+						<?php foreach ( $statuses as $val => $label ) : ?>
+							<option value="<?php echo esc_attr( $val ); ?>" <?php selected( (string) ( $r['status'] ?? 'completed' ), $val ); ?>><?php echo esc_html( $label ); ?></option>
+						<?php endforeach; ?>
+					</select><p class="description">Only <strong>Completed</strong> entries with “Join leaderboard” show publicly.</p></td></tr>
+					<tr><th><label>Score</label></th><td><input type="number" min="0" max="<?php echo (int) NAASE_QUESTIONS_PER_ATTEMPT; ?>" name="score" value="<?php echo esc_attr( $r['score'] ); ?>"> / <?php echo (int) NAASE_QUESTIONS_PER_ATTEMPT; ?></td></tr>
+					<tr><th><label>Completion time</label></th><td>
+						<input type="number" min="0" name="duration_min" value="<?php echo (int) $dur_min; ?>" style="width:80px;"> min
+						<input type="number" min="0" max="59" name="duration_sec" value="<?php echo (int) $dur_sec; ?>" style="width:80px;"> sec
+						<p class="description">Completion time (chronometer) shown on the leaderboard.</p>
+					</td></tr>
 					<tr><th><label for="finished_at">Completion date</label></th><td><input type="datetime-local" step="1" id="finished_at" name="finished_at" value="<?php echo esc_attr( str_replace( ' ', 'T', (string) $r['finished_at'] ) ); ?>"><p class="description">Shown as the "Date" on the leaderboard. Pick a date &amp; time.</p></td></tr>
 					<tr><th><label>Join leaderboard</label></th><td><label><input type="checkbox" name="join_leaderboard" value="1" <?php checked( (int) $r['join_leaderboard'], 1 ); ?>> Visible on public leaderboard</label></td></tr>
 				</table>
 				<p class="description">Tier is recalculated from the score on save.</p>
 
-				<?php submit_button( 'Update entry' ); ?>
+				<?php submit_button( $is_new ? 'Add entry' : 'Update entry' ); ?>
 				<a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=naase-responses' ) ); ?>">Cancel</a>
 			</form>
 		</div>
@@ -612,31 +678,66 @@ class NAASE_Admin {
 		$id = (int) ( $_POST['id'] ?? 0 );
 		$in = wp_unslash( $_POST );
 
-		$score = isset( $in['score'] ) && '' !== $in['score'] ? max( 0, min( NAASE_QUESTIONS_PER_ATTEMPT, (int) $in['score'] ) ) : null;
+		$score    = isset( $in['score'] ) && '' !== $in['score'] ? max( 0, min( NAASE_QUESTIONS_PER_ATTEMPT, (int) $in['score'] ) ) : null;
+		$duration = max( 0, (int) ( $in['duration_min'] ?? 0 ) ) * 60 + max( 0, min( 59, (int) ( $in['duration_sec'] ?? 0 ) ) );
 
+		// Completion date → MySQL (UTC); empty means "leave as is" on edit.
+		$finished_at = '';
+		$finished_in = sanitize_text_field( $in['finished_at'] ?? '' );
+		if ( '' !== $finished_in ) {
+			$ts = strtotime( $finished_in );
+			if ( false !== $ts ) {
+				$finished_at = gmdate( 'Y-m-d H:i:s', $ts );
+			}
+		}
+
+		global $wpdb;
+
+		// New manual entry → build a complete, leaderboard-ready row.
+		if ( 0 === $id ) {
+			$wpdb->insert( // phpcs:ignore WordPress.DB
+				NAASE_DB::attempts(),
+				self::new_attempt_row(
+					array(
+						'first_name'       => $in['first_name'] ?? '',
+						'last_name'        => $in['last_name'] ?? '',
+						'email'            => $in['email'] ?? '',
+						'linkedin'         => $in['linkedin'] ?? '',
+						'status'           => $in['status'] ?? 'completed',
+						'score'            => $score,
+						'duration_seconds' => $duration,
+						'finished_at'      => $finished_at,
+						'join_leaderboard' => ! empty( $in['join_leaderboard'] ) ? 1 : 0,
+					)
+				)
+			);
+			NAASE_Leaderboard::flush();
+			self::redirect( 'naase-responses', 'attempt_added' );
+		}
+
+		// Existing entry → update.
+		$status = sanitize_key( $in['status'] ?? 'completed' );
+		if ( ! in_array( $status, array( 'completed', 'in_progress', 'timed_out', 'abandoned' ), true ) ) {
+			$status = 'completed';
+		}
 		$data = array(
 			'first_name'       => sanitize_text_field( $in['first_name'] ?? '' ),
 			'last_name'        => sanitize_text_field( $in['last_name'] ?? '' ),
 			'email'            => sanitize_email( $in['email'] ?? '' ),
 			'linkedin'         => esc_url_raw( $in['linkedin'] ?? '' ),
+			'status'           => $status,
 			'join_leaderboard' => ! empty( $in['join_leaderboard'] ) ? 1 : 0,
+			'score'            => $score,
+			'tier'             => null !== $score ? NAASE_Scoring::tier( $score ) : null,
+			'duration_seconds' => $duration,
 			'updated_at'       => current_time( 'mysql' ),
 		);
-		if ( null !== $score ) {
-			$data['score'] = $score;
-			$data['tier']  = NAASE_Scoring::tier( $score );
+		// Keep the recorded start consistent with the (possibly edited) date + duration.
+		if ( '' !== $finished_at ) {
+			$data['finished_at'] = $finished_at;
+			$data['started_at']  = gmdate( 'Y-m-d H:i:s', strtotime( $finished_at . ' UTC' ) - $duration );
 		}
 
-		// Editable completion date (the leaderboard "Date"). Normalised to MySQL datetime.
-		$finished = sanitize_text_field( $in['finished_at'] ?? '' );
-		if ( '' !== $finished ) {
-			$ts = strtotime( $finished );
-			if ( false !== $ts ) {
-				$data['finished_at'] = gmdate( 'Y-m-d H:i:s', $ts );
-			}
-		}
-
-		global $wpdb;
 		$wpdb->update( NAASE_DB::attempts(), $data, array( 'id' => $id ) ); // phpcs:ignore WordPress.DB
 
 		// The displayed name/score changed → drop the cached badge so it regenerates.
@@ -647,6 +748,174 @@ class NAASE_Admin {
 		NAASE_Leaderboard::flush();
 
 		self::redirect( 'naase-responses', 'attempt_saved' );
+	}
+
+	/**
+	 * Build a complete attempts-table row from loose input (used by the Add form and
+	 * the importer). Generates a token, derives tier from score and started_at from
+	 * the completion date minus the duration, and defaults the date to "now".
+	 *
+	 * @param array $d first_name, last_name, email, linkedin, status, score,
+	 *                 duration_seconds, finished_at (MySQL UTC or ''), join_leaderboard.
+	 * @return array Row ready for $wpdb->insert().
+	 */
+	private static function new_attempt_row( array $d ) {
+		$score    = ( isset( $d['score'] ) && '' !== $d['score'] && null !== $d['score'] )
+			? max( 0, min( NAASE_QUESTIONS_PER_ATTEMPT, (int) $d['score'] ) )
+			: null;
+		$duration = max( 0, (int) ( $d['duration_seconds'] ?? 0 ) );
+		$status   = in_array( ( $d['status'] ?? 'completed' ), array( 'completed', 'in_progress', 'timed_out', 'abandoned' ), true )
+			? $d['status']
+			: 'completed';
+
+		$finished_at = (string) ( $d['finished_at'] ?? '' );
+		if ( '' === $finished_at ) {
+			$finished_at = current_time( 'mysql', true ); // GMT.
+		}
+		$started_at = gmdate( 'Y-m-d H:i:s', strtotime( $finished_at . ' UTC' ) - $duration );
+		$now        = current_time( 'mysql' );
+
+		return array(
+			'token'               => wp_generate_password( 32, false, false ),
+			'status'              => $status,
+			'first_name'          => sanitize_text_field( $d['first_name'] ?? '' ),
+			'last_name'           => sanitize_text_field( $d['last_name'] ?? '' ),
+			'email'               => sanitize_email( $d['email'] ?? '' ),
+			'linkedin'            => esc_url_raw( $d['linkedin'] ?? '' ),
+			'score'               => $score,
+			'tier'                => null !== $score ? NAASE_Scoring::tier( $score ) : null,
+			'duration_seconds'    => $duration,
+			'started_at'          => $started_at,
+			'finished_at'         => $finished_at,
+			'join_leaderboard'    => ! empty( $d['join_leaderboard'] ) ? 1 : 0,
+			'membership_interest' => 0,
+			'answers_string'      => '',
+			'created_at'          => $now,
+			'updated_at'          => $now,
+		);
+	}
+
+	/**
+	 * Import past participants (CSV/JSON) as completed attempts. Appends — never wipes.
+	 */
+	public static function handle_import_attempts() {
+		self::guard( 'naase_import_attempts' );
+		if ( empty( $_FILES['naase_file']['tmp_name'] ) ) {
+			self::redirect( 'naase-responses', 'error' );
+		}
+		$tmp  = $_FILES['naase_file']['tmp_name']; // phpcs:ignore
+		$name = sanitize_file_name( $_FILES['naase_file']['name'] ?? '' );
+		$raw  = file_get_contents( $tmp ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+
+		if ( preg_match( '/\.json$/i', $name ) ) {
+			$decoded = json_decode( $raw, true );
+			$rows    = is_array( $decoded ) ? $decoded : array();
+		} else {
+			$rows = self::parse_csv( $raw );
+		}
+
+		global $wpdb;
+		$imported = 0;
+		$skipped  = 0;
+		foreach ( $rows as $row ) {
+			$d = self::normalize_attempt_import_row( $row );
+			// A name (first or last) is the minimum to be a meaningful leaderboard row.
+			if ( '' === trim( $d['first_name'] . $d['last_name'] ) ) {
+				$skipped++;
+				continue;
+			}
+			$wpdb->insert( NAASE_DB::attempts(), self::new_attempt_row( $d ) ); // phpcs:ignore WordPress.DB
+			$imported++;
+		}
+
+		NAASE_Leaderboard::flush();
+		self::redirect( 'naase-responses', 'entries_imported', array( 'imported' => $imported, 'skipped' => $skipped ) );
+	}
+
+	/**
+	 * Map a raw import row (CSV/JSON, lower-cased keys) onto attempt fields.
+	 * Accepts a single "name" column (split on the first space) or first_name/last_name,
+	 * and "duration_seconds" or "time" (both in seconds) for the completion time.
+	 *
+	 * @param array $row Raw row.
+	 * @return array
+	 */
+	private static function normalize_attempt_import_row( array $row ) {
+		$row = array_change_key_case( $row, CASE_LOWER );
+
+		$first = trim( (string) ( $row['first_name'] ?? '' ) );
+		$last  = trim( (string) ( $row['last_name'] ?? '' ) );
+		if ( '' === $first && '' === $last && ! empty( $row['name'] ) ) {
+			$parts = preg_split( '/\s+/', trim( (string) $row['name'] ), 2 );
+			$first = $parts[0] ?? '';
+			$last  = $parts[1] ?? '';
+		}
+
+		$duration = isset( $row['duration_seconds'] ) && '' !== $row['duration_seconds']
+			? (int) $row['duration_seconds']
+			: (int) ( $row['time'] ?? 0 );
+
+		$finished = trim( (string) ( $row['finished_at'] ?? ( $row['date'] ?? '' ) ) );
+		if ( '' !== $finished ) {
+			$ts       = strtotime( $finished );
+			$finished = false !== $ts ? gmdate( 'Y-m-d H:i:s', $ts ) : '';
+		}
+
+		$join = $row['join_leaderboard'] ?? 1; // Default to visible — the point of importing.
+		$join = in_array( strtolower( (string) $join ), array( '0', 'no', 'false', '' ), true ) ? 0 : 1;
+
+		return array(
+			'first_name'       => $first,
+			'last_name'        => $last,
+			'email'            => $row['email'] ?? '',
+			'linkedin'         => $row['linkedin'] ?? '',
+			'status'           => $row['status'] ?? 'completed',
+			'score'            => $row['score'] ?? '',
+			'duration_seconds' => $duration,
+			'finished_at'      => $finished,
+			'join_leaderboard' => $join,
+		);
+	}
+
+	/**
+	 * Export all attempts as CSV or JSON.
+	 */
+	public static function handle_export_attempts() {
+		self::guard( 'naase_export_attempts' );
+		$format = isset( $_GET['format'] ) ? sanitize_key( wp_unslash( $_GET['format'] ) ) : 'csv';
+
+		global $wpdb;
+		$table = NAASE_DB::attempts();
+		$items = $wpdb->get_results( "SELECT * FROM {$table} ORDER BY id ASC", ARRAY_A ); // phpcs:ignore WordPress.DB
+		$cols  = array( 'id', 'status', 'first_name', 'last_name', 'email', 'linkedin', 'score', 'tier', 'duration_seconds', 'finished_at', 'join_leaderboard', 'answers_string' );
+
+		$rows = array_map(
+			static function ( $r ) use ( $cols ) {
+				$o = array();
+				foreach ( $cols as $c ) {
+					$o[ $c ] = $r[ $c ] ?? '';
+				}
+				return $o;
+			},
+			$items ? $items : array()
+		);
+
+		if ( 'json' === $format ) {
+			header( 'Content-Type: application/json; charset=utf-8' );
+			header( 'Content-Disposition: attachment; filename="naase-entries.json"' );
+			echo wp_json_encode( $rows, JSON_PRETTY_PRINT ); // phpcs:ignore WordPress.Security.EscapeOutput
+			exit;
+		}
+
+		header( 'Content-Type: text/csv; charset=utf-8' );
+		header( 'Content-Disposition: attachment; filename="naase-entries.csv"' );
+		$out = fopen( 'php://output', 'w' );
+		fputcsv( $out, $cols );
+		foreach ( $rows as $row ) {
+			fputcsv( $out, array_values( $row ) );
+		}
+		fclose( $out ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+		exit;
 	}
 
 	public static function handle_delete_attempt() {
