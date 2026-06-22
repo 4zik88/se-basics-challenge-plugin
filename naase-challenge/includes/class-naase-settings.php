@@ -32,6 +32,8 @@ class NAASE_Settings {
 			'post_completion'    => 'Enter your information to receive your detailed results, a personalized breakdown, and your digital badge:',
 			'share_text'         => "I just scored {score}/{total} ({tier}) on the NAASE SE Basics Challenge! Can you beat my score?\n⏱ My time is {time}, which is {time_percent} of allowed time.\n🏆 {percent} of correct answers.\n📊 {ordinal} tier out of four — {tier}.",
 			'privacy_text'       => 'We respect your privacy. Your information is used only to deliver your results and, if you opt in, to display you on the leaderboard.',
+			'challenge_page_url'   => '',
+			'leaderboard_page_url' => '',
 			'zapier_webhook_url' => '',
 		);
 	}

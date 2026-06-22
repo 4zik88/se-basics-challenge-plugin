@@ -208,23 +208,42 @@ class NAASE_Rewrites {
 	}
 
 	/**
-	 * URL of the leaderboard: prefer a page that hosts the shortcode, else the rewrite URL.
+	 * URL of the leaderboard: an explicit override, else a page that hosts the
+	 * shortcode, else the standalone rewrite URL.
 	 *
 	 * @return string
 	 */
 	public static function leaderboard_url() {
+		$override = trim( (string) NAASE_Settings::get( 'leaderboard_page_url' ) );
+		if ( '' !== $override ) {
+			return $override;
+		}
 		$page = self::find_page_with_shortcode( 'naase_leaderboard' );
 		return $page ? get_permalink( $page ) : home_url( '/naase-leaderboard/' );
 	}
 
 	/**
-	 * URL of the challenge: a page that hosts [naase_challenge], else home.
+	 * URL of the challenge: an explicit override, else a page that hosts [naase_challenge],
+	 * else home.
 	 *
 	 * @return string
 	 */
 	public static function challenge_url() {
+		$override = trim( (string) NAASE_Settings::get( 'challenge_page_url' ) );
+		if ( '' !== $override ) {
+			return $override;
+		}
 		$page = self::find_page_with_shortcode( 'naase_challenge' );
 		return $page ? get_permalink( $page ) : home_url( '/' );
+	}
+
+	/**
+	 * Forget the cached page lookups so a freshly created/edited challenge or
+	 * leaderboard page is picked up immediately (called when settings are saved).
+	 */
+	public static function flush_page_cache() {
+		delete_transient( 'naase_page_naase_challenge' );
+		delete_transient( 'naase_page_naase_leaderboard' );
 	}
 
 	/**

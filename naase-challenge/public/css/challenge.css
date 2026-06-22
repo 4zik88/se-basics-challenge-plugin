@@ -450,6 +450,9 @@
     font-weight: 600;
     font-size: 14px;
     padding: 16px 36px;
+    /* Pin the button to the bottom of the side column so it lines up with the last
+       answer, as in the design — the side column stretches to the question's height. */
+    margin-top: auto;
 }
 
 /* ============ CONTACT FORM ============ */
@@ -869,6 +872,9 @@
     }
     .naase-q {
         grid-template-columns: 1fr;
+    }
+    .naase-q-next {
+        margin-top: 0;
     }
     .naase-result-strip {
         flex-direction: column;

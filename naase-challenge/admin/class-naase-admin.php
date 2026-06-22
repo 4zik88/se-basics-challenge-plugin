@@ -177,6 +177,24 @@ class NAASE_Admin {
 					</tr>
 				</table>
 
+				<h2>Pages</h2>
+				<table class="form-table" role="presentation">
+					<tr>
+						<th><label for="challenge_page_url">Challenge page URL</label></th>
+						<td>
+							<input class="regular-text" type="url" id="challenge_page_url" name="challenge_page_url" value="<?php echo esc_attr( $s['challenge_page_url'] ); ?>" placeholder="https://example.com/se-basics-challenge/">
+							<p class="description">URL of the page that holds <code>[naase_challenge]</code>. Used by the “Challenge yourself” button. Leave blank to auto-detect.</p>
+						</td>
+					</tr>
+					<tr>
+						<th><label for="leaderboard_page_url">Leaderboard page URL</label></th>
+						<td>
+							<input class="regular-text" type="url" id="leaderboard_page_url" name="leaderboard_page_url" value="<?php echo esc_attr( $s['leaderboard_page_url'] ); ?>" placeholder="https://example.com/se-basics-leaderboard/">
+							<p class="description">URL of the page that holds <code>[naase_leaderboard]</code>. Used by the “See the Leaderboard” buttons. Leave blank to auto-detect.</p>
+						</td>
+					</tr>
+				</table>
+
 				<h2>Integrations</h2>
 				<table class="form-table" role="presentation">
 					<tr>
@@ -453,12 +471,16 @@ class NAASE_Admin {
 			'post_completion'    => sanitize_textarea_field( $in['post_completion'] ?? '' ),
 			'share_text'         => sanitize_textarea_field( $in['share_text'] ?? '' ),
 			'privacy_text'       => sanitize_textarea_field( $in['privacy_text'] ?? '' ),
+			'challenge_page_url'   => esc_url_raw( $in['challenge_page_url'] ?? '' ),
+			'leaderboard_page_url' => esc_url_raw( $in['leaderboard_page_url'] ?? '' ),
 			'zapier_webhook_url' => esc_url_raw( $in['zapier_webhook_url'] ?? '' ),
 		);
 		for ( $i = 1; $i <= 4; $i++ ) {
 			$out[ 'feature_' . $i ] = sanitize_text_field( $in[ 'feature_' . $i ] ?? '' );
 		}
 		NAASE_Settings::update( $out );
+		// A new/edited page may now host a shortcode — drop the cached page lookups.
+		NAASE_Rewrites::flush_page_cache();
 		self::redirect( self::SLUG, 'settings_saved' );
 	}
 
