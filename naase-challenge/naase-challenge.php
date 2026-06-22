@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       NAASE SE Basics Challenge
  * Description:        Sales Engineering Basics Challenge — a 12-question timed quiz with scoring, tiers, badges, social sharing, a leaderboard and Zapier notifications. Renders via the [naase_challenge] shortcode.
- * Version:           1.3.1
+ * Version:           1.3.2
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Viacheslav Tykhenkyi
@@ -14,7 +14,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'NAASE_VERSION', '1.3.1' );
+define( 'NAASE_VERSION', '1.3.2' );
 define( 'NAASE_PLUGIN_FILE', __FILE__ );
 define( 'NAASE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'NAASE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

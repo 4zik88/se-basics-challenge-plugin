@@ -938,4 +938,8 @@
     white-space: nowrap;
     border: 0;
   }
+
+  .naase-app .naase-stat-value {
+    font-size: 20px;
+  }
 }
