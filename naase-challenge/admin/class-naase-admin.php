@@ -250,7 +250,7 @@ class NAASE_Admin {
 					<input type="hidden" name="action" value="naase_import_questions">
 					<?php wp_nonce_field( 'naase_import_questions' ); ?>
 					<input type="file" name="naase_file" accept=".csv,.json" required>
-					<label style="display:block;margin:6px 0;"><input type="checkbox" name="naase_replace" value="1" checked> Replace bank &amp; renumber from 1 (Q1, Q2, …)</label>
+					<label style="display:block;margin:6px 0;"><input type="checkbox" name="naase_replace" value="1"> Replace bank &amp; renumber from 1 (Q1, Q2, …)</label>
 					<?php submit_button( 'Import CSV / JSON', 'secondary', 'submit', false ); ?>
 				</form>
 				<a class="button" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=naase_export_questions&format=csv' ), 'naase_export_questions' ) ); ?>">Export CSV</a>
@@ -575,7 +575,7 @@ class NAASE_Admin {
 		self::guard( 'naase_export_questions' );
 		$format = isset( $_GET['format'] ) ? sanitize_key( wp_unslash( $_GET['format'] ) ) : 'csv';
 		$items  = NAASE_Questions::all();
-		$cols   = array( 'question_text', 'answer_a', 'answer_b', 'answer_c', 'answer_d', 'correct_answer', 'knowledge_area', 'difficulty', 'public_note', 'internal_note' );
+		$cols   = array( 'id', 'question_text', 'answer_a', 'answer_b', 'answer_c', 'answer_d', 'correct_answer', 'knowledge_area', 'difficulty', 'public_note', 'internal_note' );
 
 		// Project every row onto the export columns once, then branch only on output format.
 		$rows = array_map(

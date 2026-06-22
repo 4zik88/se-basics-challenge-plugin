@@ -47,12 +47,15 @@ class NAASE_Rewrites {
 	public static function maybe_render() {
 		$token = get_query_var( 'naase_result' );
 		if ( $token ) {
+			// Terminal paths (badge / share / standalone fallback) exit themselves; the
+			// theme-wrapped path takes over the main query and returns so WordPress keeps
+			// rendering the host page's template — so no blanket exit here.
 			self::render_result( (string) $token );
-			exit;
+			return;
 		}
 		if ( get_query_var( 'naase_leaderboard' ) ) {
 			self::render_leaderboard();
-			exit;
+			return;
 		}
 	}
 
@@ -91,17 +94,16 @@ class NAASE_Rewrites {
 			exit;
 		}
 
-		status_header( $valid ? 200 : 404 );
-
-		if ( $valid ) {
-			NAASE_Badge::ensure( $row );
-			$title   = NAASE_Settings::get( 'challenge_title' );
-			$content = NAASE_Templates::get( 'result', array( 'summary' => NAASE_Attempts::result_summary( $row ) ) );
-			self::render_page( $title, $content, $row );
-		} else {
-			$content = NAASE_Templates::get( 'not-found', array() );
-			self::render_page( __( 'Result not found', 'naase-challenge' ), $content );
+		if ( ! $valid ) {
+			status_header( 404 );
+			self::render_standalone( __( 'Result not found', 'naase-challenge' ), NAASE_Templates::get( 'not-found', array() ) );
+			exit;
 		}
+
+		NAASE_Badge::ensure( $row );
+		$title   = NAASE_Settings::get( 'challenge_title' );
+		$content = NAASE_Templates::get( 'result', array( 'summary' => NAASE_Attempts::result_summary( $row ) ) );
+		self::render_page( $title, $content, $row );
 	}
 
 	/**
@@ -112,17 +114,144 @@ class NAASE_Rewrites {
 	}
 
 	/**
-	 * Output a self-contained HTML page for plugin rewrite endpoints.
+	 * Render a plugin rewrite endpoint (result / leaderboard) wrapped in the site's
+	 * own header & footer so these pages carry the theme's chrome.
 	 *
-	 * The site's active theme may be a block theme without header.php/footer.php, so we
-	 * render our own minimal document and load the plugin's own styles directly. This keeps
-	 * the result / leaderboard pages styled and theme-independent.
+	 * Rather than hand-build a document (which can't reproduce a block theme's layout,
+	 * root padding and global styles), we hand rendering to the active theme: the main
+	 * query is re-pointed at a real "host" page and our HTML is injected via the_content,
+	 * so WordPress renders its normal page template. Identical chrome & styling on any
+	 * theme — classic or block. Only if there is no host page do we fall back to a
+	 * self-contained, theme-independent document.
 	 *
 	 * @param string     $title   Page title.
 	 * @param string     $content Body HTML.
 	 * @param array|null $og_row  Attempt row for OpenGraph tags (result page only).
 	 */
 	private static function render_page( $title, $content, $og_row = null ) {
+		$host_id = self::host_page_id();
+		if ( $host_id ) {
+			self::render_in_host_page( $host_id, $title, $content, $og_row );
+			return; // WordPress keeps rendering the host page's template.
+		}
+		self::render_standalone( $title, $content, $og_row );
+		exit;
+	}
+
+	/**
+	 * A real published page whose template we borrow so plugin pages inherit the
+	 * site's header, footer and global styles. Prefer the challenge page; fall back
+	 * to the leaderboard page or any published page.
+	 *
+	 * @return int 0 if none.
+	 */
+	private static function host_page_id() {
+		$url = trim( (string) NAASE_Settings::get( 'challenge_page_url' ) );
+		if ( '' !== $url ) {
+			$id = url_to_postid( $url );
+			if ( $id ) {
+				return $id;
+			}
+		}
+		$id = self::find_page_with_shortcode( 'naase_challenge' );
+		if ( $id ) {
+			return $id;
+		}
+		return self::find_page_with_shortcode( 'naase_leaderboard' );
+	}
+
+	/**
+	 * Take over the main query with a host page and inject our HTML as its content,
+	 * so the active theme renders it inside the normal page template (header/footer
+	 * and global styles intact). Does NOT exit — WordPress continues to template_include.
+	 *
+	 * @param int        $host_id Host page ID.
+	 * @param string     $title   Page title.
+	 * @param string     $content Body HTML.
+	 * @param array|null $og_row  Attempt row for OpenGraph tags (result page only).
+	 */
+	private static function render_in_host_page( $host_id, $title, $content, $og_row = null ) {
+		$host = get_post( $host_id );
+		if ( ! $host ) {
+			self::render_standalone( $title, $content, $og_row );
+			exit;
+		}
+
+		global $wp_query, $post;
+		$post = $host;
+		setup_postdata( $post );
+
+		$wp_query->post             = $host;
+		$wp_query->posts            = array( $host );
+		$wp_query->queried_object   = $host;
+		$wp_query->queried_object_id = $host_id;
+		$wp_query->post_count       = 1;
+		$wp_query->found_posts      = 1;
+		$wp_query->max_num_pages    = 1;
+		$wp_query->is_page          = true;
+		$wp_query->is_singular      = true;
+		$wp_query->is_single        = false;
+		$wp_query->is_home          = false;
+		$wp_query->is_archive       = false;
+		$wp_query->is_404           = false;
+
+		status_header( 200 );
+
+		// Replace the host page's own content (e.g. the [naase_challenge] shortcode)
+		// with our pre-rendered HTML. Highest priority so it wins over wpautop/do_blocks.
+		add_filter(
+			'the_content',
+			static function () use ( $content ) {
+				return $content;
+			},
+			PHP_INT_MAX
+		);
+
+		self::prepare_themed_head( $title, $og_row );
+	}
+
+	/**
+	 * Hook the document title, OpenGraph tags and plugin stylesheet so they land in
+	 * <head> when the theme template renders (wp_head fires wp_enqueue_scripts).
+	 *
+	 * @param string     $title  Page title.
+	 * @param array|null $og_row Attempt row for OpenGraph tags (result page only).
+	 */
+	private static function prepare_themed_head( $title, $og_row = null ) {
+		add_filter(
+			'pre_get_document_title',
+			static function () use ( $title ) {
+				return $title;
+			}
+		);
+		if ( $og_row ) {
+			add_action(
+				'wp_head',
+				static function () use ( $og_row ) {
+					NAASE_OpenGraph::render( $og_row );
+				}
+			);
+		}
+		// The host page's content is replaced, so its shortcode never enqueues our
+		// stylesheet — enqueue it here. wp_enqueue_scripts fires during wp_head.
+		add_action(
+			'wp_enqueue_scripts',
+			static function () {
+				wp_enqueue_style( 'naase-challenge' );
+			},
+			20
+		);
+	}
+
+	/**
+	 * Output a self-contained HTML page for plugin rewrite endpoints (block-theme
+	 * fallback: renders our own minimal document and loads the plugin styles directly).
+	 *
+	 * @param string     $title   Page title.
+	 * @param string     $content Body HTML.
+	 * @param array|null $og_row  Attempt row for OpenGraph tags (result page only).
+	 */
+	private static function render_standalone( $title, $content, $og_row = null ) {
 		$css         = NAASE_PLUGIN_URL . 'public/css/challenge.css?ver=' . NAASE_VERSION;
 		$fonts_title = 'https://fonts.googleapis.com/css2?family=League+Gothic&display=swap';
 		$fonts_body  = 'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap';

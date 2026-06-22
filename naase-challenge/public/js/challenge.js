@@ -40,7 +40,40 @@
 		}
 	}
 
-	function api(path, body) {
+	// Some hardened sites disable the WP REST API for guests. We probe it once per page
+	// load; if it's blocked we route every call through admin-ajax.php instead (which
+	// those tools usually leave open). Picking the transport up front — before any
+	// non-idempotent call — means answers/form submissions never double-fire.
+	var transport = null;
+	var transportPromise = null;
+	function pickTransport() {
+		if (transportPromise) {
+			return transportPromise;
+		}
+		transportPromise = fetch(CFG.restUrl + 'ping', {
+			method: 'GET',
+			credentials: 'same-origin'
+		}).then(function (res) {
+			transport = res.ok ? 'rest' : 'ajax';
+			return transport;
+		}).catch(function () {
+			transport = 'ajax';
+			return transport;
+		});
+		return transportPromise;
+	}
+
+	function handleResponse(res) {
+		return res.json().then(function (data) {
+			if (!res.ok) {
+				var msg = (data && data.message) ? data.message : 'Something went wrong.';
+				throw new Error(msg);
+			}
+			return data;
+		});
+	}
+
+	function restCall(path, body) {
 		return fetch(CFG.restUrl + path, {
 			method: 'POST',
 			headers: {
@@ -49,14 +82,26 @@
 			},
 			credentials: 'same-origin',
 			body: JSON.stringify(body || {})
-		}).then(function (res) {
-			return res.json().then(function (data) {
-				if (!res.ok) {
-					var msg = (data && data.message) ? data.message : 'Something went wrong.';
-					throw new Error(msg);
-				}
-				return data;
-			});
+		}).then(handleResponse);
+	}
+
+	function ajaxCall(path, body) {
+		// '/submit-form' → 'naase_submit_form'
+		var action = 'naase_' + path.replace(/^\//, '').replace(/-/g, '_');
+		var fd = new FormData();
+		fd.append('action', action);
+		fd.append('_wpnonce', CFG.nonce);
+		fd.append('payload', JSON.stringify(body || {}));
+		return fetch(CFG.ajaxUrl, {
+			method: 'POST',
+			credentials: 'same-origin',
+			body: fd
+		}).then(handleResponse);
+	}
+
+	function api(path, body) {
+		return pickTransport().then(function (transport) {
+			return transport === 'ajax' ? ajaxCall(path, body) : restCall(path, body);
 		});
 	}
 
@@ -137,8 +182,16 @@
 
 	function beacon(path, body) {
 		try {
-			var blob = new Blob([JSON.stringify(body)], { type: 'application/json' });
 			if (navigator.sendBeacon) {
+				if (transport === 'ajax') {
+					var fd = new FormData();
+					fd.append('action', 'naase_' + path.replace(/^\//, '').replace(/-/g, '_'));
+					fd.append('_wpnonce', CFG.nonce);
+					fd.append('payload', JSON.stringify(body || {}));
+					navigator.sendBeacon(CFG.ajaxUrl, fd);
+					return;
+				}
+				var blob = new Blob([JSON.stringify(body)], { type: 'application/json' });
 				navigator.sendBeacon(CFG.restUrl + path + '?_wpnonce=' + encodeURIComponent(CFG.nonce), blob);
 				return;
 			}

@@ -39,6 +39,7 @@ class NAASE_Shortcodes {
 		$settings = NAASE_Settings::all();
 		return array(
 			'restUrl'        => esc_url_raw( rest_url( NAASE_REST::NS . '/' ) ),
+			'ajaxUrl'        => esc_url_raw( admin_url( 'admin-ajax.php' ) ),
 			'nonce'          => wp_create_nonce( 'wp_rest' ),
 			'total'          => NAASE_QUESTIONS_PER_ATTEMPT,
 			'timeoutSeconds' => NAASE_TIMEOUT_SECONDS,

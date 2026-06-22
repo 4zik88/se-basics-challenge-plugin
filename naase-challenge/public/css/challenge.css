@@ -102,7 +102,7 @@
 .naase-app .naase-title-completing,
 .naase-app .naase-title-result {
     font-size: 36px;
-    font-weight: 700;
+    font-weight: 400;
     margin: 0 0 32px;
 }
 
@@ -163,7 +163,7 @@
 .naase-app .naase-btn--ghost {
     background: #fff;
     font-weight: 500;
-    color: #06509E;
+    color: #06509E !important;
     border-color: #06509E;
 }
 .naase-app .naase-btn--ghost:hover {
@@ -216,7 +216,7 @@
     border: 1px solid #e8eef3;
     border-radius: 6px;
     padding: 16px 20px;
-    max-width: 258px;
+    max-width: 265px;
     font-weight: 400;
     color: #2d2c34;
     font-size: 18px;
@@ -289,7 +289,7 @@
 }
 .naase-app .naase-q-text {
     font-size: 24px;
-    font-weight: 700;
+    font-weight: 400;
     margin: 0 0 24px;
 }
 
