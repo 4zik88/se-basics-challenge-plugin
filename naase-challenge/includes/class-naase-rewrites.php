@@ -177,6 +177,11 @@ class NAASE_Rewrites {
 			exit;
 		}
 
+		// We point the query at the host page only to borrow its template; the real URL
+		// stays /naase-result/{token}/. Stop WordPress from "correcting" that URL to the
+		// host page's permalink (which would bounce the visitor to the challenge start).
+		add_filter( 'redirect_canonical', '__return_false' );
+
 		global $wp_query, $post;
 		$post = $host;
 		setup_postdata( $post );
